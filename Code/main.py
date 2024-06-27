@@ -1,10 +1,5 @@
 import sqlite3
-from login import getidentity
-#连接数据库
-def getConnection():
-    dbstring="E:\Code\Python\专业综合训练Ⅱ\library\library.db"
-    conn=sqlite3.connect(dbstring)
-    return conn
+from login import getidentity,getConnection
 
 a=getidentity()
 if a == -1:

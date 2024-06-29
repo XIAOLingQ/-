@@ -1,49 +1,47 @@
 import sqlite3
 
-def getConnection():
+from user import User
+from adminer import Adminer
+
+def getconnection():
     dbstring="E:\Code\Python\专业综合训练Ⅱ\library\library.db"
     conn=sqlite3.connect(dbstring)
     return conn
-def login(username, password):
 
-    # 连接数据库
-    conn = getConnection()
-    cursor = conn.cursor()
+def loggin():
+    while True :
+        print("请输入登录身份")
+        print("1.用户     2.管理员     3.退出")
+        a=int(input())
+        if a == 1:
+            table_name = "user"
+        elif a == 2:
+            table_name = "adminer"
+        elif a == 3:
+            print("退出登录")
+            return None
+        else:
+            print("无效的选项，请重新选择。")
+            continue
 
-    # 查询表log
-    cursor.execute("SELECT identity FROM log WHERE username = ? AND password = ?", (username, password))
-    result = cursor.fetchone()
+        username = input("请输入用户名: ")
+        password = input("请输入密码: ")
 
-    # 关闭数据库连接
-    conn.close()
+        conn = getconnection()
+        cursor = conn.cursor()
 
-    # 根据查询结果返回相应的值
-    if result:
-        identity = result[0]
-        if identity == 'amdiner':
-            return 1
-        elif identity == 'user':
-            return 0
-    return -1  # 如果用户名或密码不正确，返回-1
+        query = f"SELECT * FROM {table_name} WHERE username=? AND password=?"
+        cursor.execute(query, (username, password))
+        result = cursor.fetchone()
 
-
-
-def getidentity():
-    while(1):
-        print("1.登录")
-        print("2.退出")
-        a = input("请选择：")
-        if a == "1" :
-            username = input("请输入用户名:")
-            password = input("请输入密码:")
-            login_result = login(username, password)
-            if login_result == 1:
-                print("登录成功，身份是管理员。")
-                return 1
-            elif login_result == 0:
-                print("登录成功，身份是用户。")
-                return 0
-            else:
-                print("用户名或密码不正确。")
-        elif a=="2" :
-            return -1
+        if result:
+            user_id, name = result[0], result[1]
+            print("登录成功!")
+            conn.close()
+            if a==1 :
+                return User(user_id,name)
+            else :
+                return Adminer(user_id,name)
+        else:
+            print("用户名或密码错误，请重试。")
+            conn.close()

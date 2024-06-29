@@ -1,11 +1,15 @@
 import sqlite3
-from login import getidentity,getConnection
+from user import *
+from login import *
+from adminer import *
 
-a=getidentity()
-if a == -1:
-    print("退出程序")
-elif a == 1:
-    print("进入用户系统")
+using = loggin()
+if using is None:
+    print("程序已退出")
+elif isinstance(using, User):
+    print(f"欢迎, 用户 {using.name} (用户ID: {using.user_id})")
+    #
+elif isinstance(using, Adminer):
+    print(f"欢迎, 管理员 {using.name} (管理员ID: {using.user_id})")
+    # 在这里添加管理员的操作
 
-else :
-    print("进入管理员系统")

@@ -215,7 +215,7 @@
 									"font": "Arial;13;1",
 									"left": 168,
 									"top": 613,
-									"width": 219.26171875,
+									"width": 221.17236328125,
 									"height": 13,
 									"text": "user用户"
 								},
@@ -241,7 +241,7 @@
 											"font": "Arial;13;0",
 											"left": 173,
 											"top": 636,
-											"width": 209.26171875,
+											"width": 211.17236328125,
 											"height": 13
 										},
 										{
@@ -256,7 +256,7 @@
 											"font": "Arial;13;0",
 											"left": 173,
 											"top": 651,
-											"width": 209.26171875,
+											"width": 211.17236328125,
 											"height": 13
 										},
 										{
@@ -271,7 +271,7 @@
 											"font": "Arial;13;0",
 											"left": 173,
 											"top": 666,
-											"width": 209.26171875,
+											"width": 211.17236328125,
 											"height": 13
 										},
 										{
@@ -286,21 +286,21 @@
 											"font": "Arial;13;0",
 											"left": 173,
 											"top": 681,
-											"width": 209.26171875,
+											"width": 211.17236328125,
 											"height": 13
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 168,
 									"top": 631,
-									"width": 219.26171875,
+									"width": 221.17236328125,
 									"height": 68
 								}
 							],
 							"font": "Arial;13;0",
 							"left": 168,
 							"top": 608,
-							"width": 219.26171875,
+							"width": 221.17236328125,
 							"height": 91,
 							"nameLabel": {
 								"$ref": "AAAAAAGQXfm+VKF/GvI="
@@ -635,9 +635,9 @@
 									"font": "Arial;13;1",
 									"left": 608,
 									"top": 157,
-									"width": 219.26171875,
+									"width": 221.17236328125,
 									"height": 13,
-									"text": "adminer"
+									"text": "adminer管理员"
 								},
 								{
 									"_type": "ERDColumnCompartmentView",
@@ -661,7 +661,7 @@
 											"font": "Arial;13;0",
 											"left": 613,
 											"top": 180,
-											"width": 209.26171875,
+											"width": 211.17236328125,
 											"height": 13
 										},
 										{
@@ -676,7 +676,7 @@
 											"font": "Arial;13;0",
 											"left": 613,
 											"top": 195,
-											"width": 209.26171875,
+											"width": 211.17236328125,
 											"height": 13
 										},
 										{
@@ -691,7 +691,7 @@
 											"font": "Arial;13;0",
 											"left": 613,
 											"top": 210,
-											"width": 209.26171875,
+											"width": 211.17236328125,
 											"height": 13
 										},
 										{
@@ -706,21 +706,21 @@
 											"font": "Arial;13;0",
 											"left": 613,
 											"top": 225,
-											"width": 209.26171875,
+											"width": 211.17236328125,
 											"height": 13
 										}
 									],
 									"font": "Arial;13;0",
 									"left": 608,
 									"top": 175,
-									"width": 219.26171875,
+									"width": 221.17236328125,
 									"height": 68
 								}
 							],
 							"font": "Arial;13;0",
 							"left": 608,
 							"top": 152,
-							"width": 219.26171875,
+							"width": 221.17236328125,
 							"height": 91,
 							"nameLabel": {
 								"$ref": "AAAAAAGQYj2tCi2IYj0="
@@ -1335,7 +1335,7 @@
 					"_parent": {
 						"$ref": "AAAAAAGQXfN2+qEnSVY="
 					},
-					"name": "adminer",
+					"name": "adminer管理员",
 					"ownedElements": [
 						{
 							"_type": "ERDRelationship",

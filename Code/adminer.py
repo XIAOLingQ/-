@@ -1,12 +1,15 @@
 import sqlite3
+
+
 class Adminer:
     def __init__(self, user_id, name):
         self.user_id = user_id
         self.name = name
-    #在类里面实现功能
-   #连接数据库
+
+    # 在类里面实现功能
+    # 连接数据库
     def getConnection(self):
-        dbstring = "D:/library/-/library/library.db"
+        dbstring = "E:\Code\Python\专业综合训练Ⅱ\library\library.db"
         con = sqlite3.connect(dbstring)
         cur = con.cursor()
         return con
@@ -35,7 +38,7 @@ class Adminer:
             copies = input("The copies is:")
             try:
                 cur.execute("insert into books(id,title,author,publisher,pub_date,price,copies)"
-                        "values(?,?,?,?,?,?,?)", (id, title, author, publisher, pub_date, price, copies))
+                            "values(?,?,?,?,?,?,?)", (id, title, author, publisher, pub_date, price, copies))
             except sqlite3.Error as e:
                 print("An error occurred:", e)
 
@@ -79,29 +82,29 @@ class Adminer:
         finally:
             conn.close()
 
-    #删除图书
+    # 删除图书信息
     def bookDel(self):
-        conn=self.getConnection()
-        cur=conn.cursor()
+        conn = self.getConnection()
+        cur = conn.cursor()
         print("\n")
         print("*************图书删除*************")
-        flag=-1
-        while flag==-1 :
+        flag = -1
+        while flag == -1:
             print("1.按图书编号进行删除")
             print("2.按图书名称进行删除")
             print("3.退出")
-            flag=int(input("请选择删除方式："))
-            if flag==1:
-                id=int(input("请输入图书编号："))
+            flag = int(input("请选择删除方式："))
+            if flag == 1:
+                id = int(input("请输入图书编号："))
                 cur.execute("SELECT COUNT(*) FROM books WHERE id = ?", (id,))
                 if cur.fetchone()[0] == 0:
                     print(f"编号为{id}的图书不存在，无需删除")
                 else:
-                    cur.execute("delete from books where id =?",(id,))
+                    cur.execute("delete from books where id =?", (id,))
                     print(f"*************编号为{id}的图书已成功删除！！！*************")
                     conn.commit()
                     conn.close()
-            elif flag==2:
+            elif flag == 2:
                 title = int(input("请输入图书名称："))
                 cur.execute("SELECT COUNT(*) FROM books WHERE title = ?", (title,))
                 if cur.fetchone()[0] == 0:
@@ -111,12 +114,13 @@ class Adminer:
                     print(f"*************图书<<{title}>>已成功删除！！！*************")
                     conn.commit()
                     conn.close()
-            elif flag==3:
+            elif flag == 3:
                 return
             else:
-                flag=-1
+                flag = -1
                 print("错误的输入，请重新选择！！！")
-    #查询图书信息
+
+    # 查询图书信息
     def bookSearch(self):
         conn = self.getConnection()
         cur = conn.cursor()
@@ -125,12 +129,12 @@ class Adminer:
         order = -1
         while order == -1:
             print("1.查询某本图书")
-            print("2.总览图书馆所有图书")
+            print("2.总览图书管所有图书")
             print("3.退出")
             order = int(input("请选择查询操作："))
             if order == 1:
-                flag=-1
-                while flag==-1 :
+                flag = -1
+                while flag == -1:
                     print("1.按图书编号进行查询")
                     print("2.按图书名称进行查询")
                     print("3.退出")
@@ -145,7 +149,8 @@ class Adminer:
                             conn.commit()
                             print(f"编号为{id}的图书信息如下：")
                             for row in cur:
-                                print(f"编号：{row[0]},书名：{row[1]},作者： {row[2]},出版社： {row[3]},出版日期：{row[4]},价格：{row[5]},副本数量：{row[6]}")
+                                print(
+                                    f"编号：{row[0]},书名：{row[1]},作者： {row[2]},出版社： {row[3]},出版日期：{row[4]},价格：{row[5]},副本数量：{row[6]}")
                             cur.close()
                             conn.close()
                     elif flag == 2:
@@ -158,7 +163,8 @@ class Adminer:
                             conn.commit()
                             print(f"图书<<{title}>>的信息如下：")
                             for row in cur:
-                                print(f"编号：{row[0]},书名：{row[1]},作者： {row[2]},出版社： {row[3]},出版日期：{row[4]},价格：{row[5]},副本数量：{row[6]}")
+                                print(
+                                    f"编号：{row[0]},书名：{row[1]},作者： {row[2]},出版社： {row[3]},出版日期：{row[4]},价格：{row[5]},副本数量：{row[6]}")
                             cur.close()
                             conn.close()
 
@@ -167,51 +173,30 @@ class Adminer:
                     else:
                         flag = -1
                         print("错误的输入，请重新选择！！！")
-            elif order==2:
+            elif order == 2:
                 print("所有图书信息如下：")
                 cur.execute("select * from books ")
-                records=cur.fetchall()
+                records = cur.fetchall()
                 for line in records:
                     print(line)
                 cur.close()
                 conn.close()
-            elif order==3:
+            elif order == 3:
                 return
             else:
-                order=-1
+                order = -1
                 print("错误的输入，请重新选择！！！")
 
-    #查询任意用户借书状态
-    def userSearch(self):
-        conn=self.getConnection()
-        cur=conn.cursor()
-        print("*************查询任意用户借书状态*************")
-        id=int(input("请输入所要查询的用户id："))
-        # 检查用户是否存在
-        cur.execute("SELECT COUNT(*) FROM user WHERE id = ?", (id,))
-        if cur.fetchone()[0] == 0:
-            print(f"id为 {id}的用户不存在")
-            conn.close()
-            return
-        else :
-            cur.execute("SELECT COUNT(*) FROM borrowed_books WHERE user_id = ?", (id,))
-            if cur.fetchone()[0] == 0:
-                print(f"id为 {id}的用户借书记录为空")
-                conn.close()
-            else :
-                cur.execute("SELECT * FROM borrowed_books WHERE user_id = ?", (id,))
-                records = cur.fetchall()
-                for line in records:
-                    cur.execute("SELECT title FROM books WHERE id = ?",(line[2],))
-                    title = cur.fetchall()
-                    print(f"图书编号：{line[2]} 书名《{title[0][0]}》 借书时间：{line[3]} 还书期限：{line[4]} {line[5]}")
-                cur.close()
-                conn.close()
+
+def menuadminer():
+    print("**************管理员***************")
+    print("1.录入图书信息     2.修改图书信息    3.删除图书信息")
+    print("4.查询图书信息     5.退出")
+
 
 if __name__ == "__main__":
-         admin = Adminer(user_id=1001, name="TOM")
-        # admin.bookInput()
-        # admin.bookModify()
-        # admin.bookDel()
-        # admin.bookSearch()
-        # admin.userSearch()
+    admin = Adminer(user_id=1001, name="TOM")
+    # admin.bookInput()
+    # admin.bookModify()
+    # admin.bookDel()
+    # admin.bookSearch()

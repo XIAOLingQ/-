@@ -1,4 +1,3 @@
-import sqlite3
 from user import *
 from login import *
 from adminer import *
@@ -11,20 +10,19 @@ elif isinstance(using, User):
     # 用户
 elif isinstance(using, Adminer):
     print(f"欢迎, 管理员 {using.name} (管理员ID: {using.user_id})")
-    while True :
+    while True:
         menuadminer()
         flag = int(input("请输入："))
-        if flag== 1 :
+        if flag == 1:
             using.bookInput()
-        elif flag == 2 :
+        elif flag == 2:
             using.bookModify()
-        elif flag == 3 :
+        elif flag == 3:
             using.bookDel()
-        elif flag == 4 :
+        elif flag == 4:
             using.bookSearch()
-        elif flag == 5 :
+        elif flag == 5:
             break
-        else :
+        else:
             print("输入错误，请重新输入：")
     # 在这里添加管理员的操作
-

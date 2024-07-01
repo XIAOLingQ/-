@@ -89,11 +89,16 @@ class User:
         cur.execute(
             "UPDATE books SET copies = copies - 1 WHERE number = ?", (number,)
         )
+        #查最大id
+        cur.execute("SELECT MAX(id) FROM borrowed_books")
+        max_id = cur.fetchone()[0]
+        if max_id is None:
+            max_id = 0
 
         # 将借阅信息插入到 borrowed_books 表
         cur.execute(
-            "INSERT INTO borrowed_books (user_id, book_number, borrow_time, return_time) VALUES (?, ?, ?, ?)",
-            (user_id, number, borrowtime, returntime)
+            "INSERT INTO borrowed_books (id,user_id, book_number, borrow_time, return_time) VALUES (?,?, ?, ?, ?)",
+            (max_id+1,user_id, number, borrowtime, returntime)
         )
 
         conn.commit()

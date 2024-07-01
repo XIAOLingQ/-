@@ -8,6 +8,7 @@ if using is None:
 elif isinstance(using, User):
     print(f"欢迎, 用户 {using.name} (用户ID: {using.user_id})")
     # 用户
+    using.user()
 elif isinstance(using, Adminer):
     print(f"欢迎, 管理员 {using.name} (管理员ID: {using.user_id})")
     while True:

@@ -1,5 +1,6 @@
 import sqlite3
-from datetime import datetime
+from datetime import datetime,timedelta
+
 
 def getconn():
     # 连接数据库的函数，请根据实际情况修改
@@ -9,6 +10,7 @@ class User:
     def __init__(self, user_id, name):
         self.user_id = user_id
         self.name = name
+
 
     @staticmethod
     def overtime(user_id):
@@ -24,11 +26,18 @@ class User:
         today = datetime.today()
         overtime_flag = 1
         for record in records:
-            if record[4] is not None:
-                if today > datetime.strptime(record[4], '%Y-%m-%d') and record[6] == 0:
-                    book_info = cur.execute("SELECT id, title FROM books WHERE id=?", (record[2],)).fetchone()
-                    print(f"图书编号:{book_info[0]}, 图书名字:{book_info[1]}, 借书时间:{record[3]}, 归还期限:{record[4]}, 状态:{record[5]}, 已超期时间:{(today - datetime.strptime(record[4], '%Y-%m-%d')).days}天")
-                    overtime_flag = 0  # 如果有超期书，将标志设置为0
+            # Ensure the record has enough fields to avoid IndexError
+            if len(record) >= 7:  # Assuming there are at least 7 fields in borrowed_books table
+                if record[4] is not None and record[6] == 0:
+                    if today > datetime.strptime(record[4], '%Y-%m-%d'):
+                        book_info = cur.execute("SELECT id, title FROM books WHERE id=?", (record[2],)).fetchone()
+                        if book_info:
+                            print(
+                                f"图书编号:{book_info[0]}, 图书名字:{book_info[1]}, 借书时间:{record[3]}, 归还期限:{record[4]}, 状态:{record[5]}")
+                        else:
+                            print("未找到对应的图书信息")
+                        overtime_flag = 0  # 如果有超期书，将标志设置为0
+
         cur.close()
         conn.close()
         return overtime_flag  # 返回超期状态
@@ -68,7 +77,7 @@ class User:
             number = result[0]
 
         # 查询图书副本数量
-        result = cur.execute("SELECT copies FROM books WHERE number=?", (number,)).fetchone()
+        result = cur.execute("SELECT copies FROM books WHERE id=?", (number,)).fetchone()
         if result is None:
             print("没有找到该图书")
             cur.close()
@@ -83,11 +92,13 @@ class User:
             return
 
         borrowtime = input("请输入借阅时间(yyyy-mm-dd)：")
-        returntime = input("请输入归还时间(yyyy-mm-dd)：")
+        borrow_date = datetime.strptime(borrowtime, "%Y-%m-%d")
+        return_date = borrow_date + timedelta(days=30)
+        print(f"还书期限是30天，到期时间是：{return_date.strftime('%Y-%m-%d')}")
 
         # 更新数据库，减少可借阅的副本数量
         cur.execute(
-            "UPDATE books SET copies = copies - 1 WHERE number = ?", (number,)
+            "UPDATE books SET copies = copies - 1 WHERE id = ?", (number,)
         )
         #查最大id
         cur.execute("SELECT MAX(id) FROM borrowed_books")
@@ -97,8 +108,8 @@ class User:
 
         # 将借阅信息插入到 borrowed_books 表
         cur.execute(
-            "INSERT INTO borrowed_books (id,user_id, book_number, borrow_time, return_time) VALUES (?,?, ?, ?, ?)",
-            (max_id+1,user_id, number, borrowtime, returntime)
+            "INSERT INTO borrowed_books (id,user_id, book_id, borrow_date, return_date) VALUES (?,?, ?, ?, ?)",
+            (max_id+1,user_id, number, borrowtime, return_date)
         )
 
         conn.commit()
@@ -117,8 +128,8 @@ class User:
         today = datetime.today()
         for record in records:
             if record[4] is not None:
-                book_info = cur.execute("SELECT * FROM books WHERE book_id=?", (record[2],)).fetchone()
-                overdue_days = (today - datetime.strptime(record[4], '%Y-%m-%d')).days if today > datetime.strptime(record[4], '%Y-%m-%d') else 0
+                book_info = cur.execute("SELECT * FROM books WHERE id=?", (record[2],)).fetchone()
+                overdue_days = (today - datetime.strptime(record[4], '%Y-%m-%d')).days if today > datetime.strptime(record[4], '%Y-%m-%d') else -1
                 status = f"已超期{overdue_days}天" if overdue_days else "未超期"
                 print(f"图书信息：图书编号:{book_info[0]}, 图书名字:{book_info[1]}, 作者：{book_info[2]}, 出版社：{book_info[3]}, 出版时间：{book_info[4]}, 价格：{book_info[5]}, 副本{book_info[0]}, 借书时间:{record[3]}, 归还期限:{record[4]}，{status}")
         if not records:
@@ -136,10 +147,16 @@ class User:
         print("你所借图书信息与状态")
         line = "-------------------------------------------"
         print(line)
-        User.querymybook(user_id)
+        User.querymybook(user_id)  # Assumes this method prints the user's borrowed books
         print(line)
         number = input("请输入所还书籍的编号：")
-        cur.execute("UPDATE books SET copies = copies + 1 WHERE number = ?", (number,))
+
+        # Update the books table to increase the number of copies
+        cur.execute("UPDATE books SET copies = copies + 1 WHERE id = ?", (number,))
+
+        # Delete the borrowed book record from borrowed_book table
+        cur.execute("DELETE FROM borrowed_book WHERE user_id = ? AND book_id = ?", (user_id, number))
+
         print("还书成功")
         conn.commit()
         cur.close()
@@ -154,7 +171,7 @@ class User:
         cur = conn.cursor()
         op = input("请输入图书编号或名字查询：")
         if op.isdigit():
-            record = cur.execute("SELECT * FROM books WHERE number=?", (op,)).fetchone()
+            record = cur.execute("SELECT * FROM books WHERE id=?", (op,)).fetchone()
             querycopy(op)
         else:
             record = cur.execute("SELECT * FROM books WHERE name=?", (op,)).fetchone()
@@ -216,9 +233,9 @@ def querycopy(number):
     """
     conn = getconn()
     cur = conn.cursor()
-    records = cur.execute("SELECT * FROM Bookstate WHERE number=?", (number,)).fetchall()
+    records = cur.execute("SELECT * FROM books WHERE id=?", (number,)).fetchall()
     for record in records:
-        status = "在库" if record[6] == 1 else "不在库"
-        print(f"副本{record[0]} 状态：{status}")
+        status = "在库" if record[6] > 0 else "不在库"
+        print(f"副本{record[0]}本 状态：{status}")
     cur.close()
     conn.close()

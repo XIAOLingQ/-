@@ -10,8 +10,9 @@ def getconnection():
 
 def loggin():
     while True :
-        print("请输入登录身份")
+
         print("1.用户     2.管理员     3.退出")
+        print("请输入登录身份")
         a=int(input())
         if a == 1:
             table_name = "user"

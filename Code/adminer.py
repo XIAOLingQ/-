@@ -9,7 +9,7 @@ class Adminer:
     # 在类里面实现功能
     # 连接数据库
     def getConnection(self):
-        dbstring = "E:\Code\Python\专业综合训练Ⅱ\library\library.db"
+        dbstring = "../library/library.db"
         con = sqlite3.connect(dbstring)
         cur = con.cursor()
         return con
@@ -187,11 +187,38 @@ class Adminer:
                 order = -1
                 print("错误的输入，请重新选择！！！")
 
+    # 查询任意用户借书状态
+    def userSearch(self):
+        conn = self.getConnection()
+        cur = conn.cursor()
+        print("*************查询任意用户借书状态*************")
+        id = int(input("请输入所要查询的用户id："))
+        # 检查用户是否存在
+        cur.execute("SELECT COUNT(*) FROM user WHERE id = ?", (id,))
+        if cur.fetchone()[0] == 0:
+            print(f"id为 {id}的用户不存在")
+            conn.close()
+            return
+        else:
+            cur.execute("SELECT COUNT(*) FROM borrowed_books WHERE user_id = ?", (id,))
+            if cur.fetchone()[0] == 0:
+                print(f"id为 {id}的用户借书记录为空")
+                conn.close()
+            else:
+                cur.execute("SELECT * FROM borrowed_books WHERE user_id = ?", (id,))
+                records = cur.fetchall()
+                for line in records:
+                    cur.execute("SELECT title FROM books WHERE id = ?", (line[2],))
+                    title = cur.fetchall()
+                    print(f"图书编号：{line[2]} 书名《{title[0][0]}》 借书时间：{line[3]} 还书期限：{line[4]} {line[5]}")
+                cur.close()
+                conn.close()
+
 
 def menuadminer():
     print("**************管理员***************")
     print("1.录入图书信息     2.修改图书信息    3.删除图书信息")
-    print("4.查询图书信息     5.退出")
+    print("4.查询图书信息     5.查询任意用户借书状态    6.退出")
 
 
 if __name__ == "__main__":

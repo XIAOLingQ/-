@@ -39,9 +39,9 @@ def loggin():
             user_id, name = result[0], result[1]
             print("登录成功!")
             conn.close()
-            if a==1 :
+            if a == 1:
                 return User(user_id,name)
-            else :
+            else:
                 return Adminer(user_id,name)
         else:
             print("用户名或密码错误，请重试。")

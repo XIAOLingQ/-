@@ -35,7 +35,7 @@ class User:
                             f"图书编号:{book_info[0]}, 图书名字:{book_info[1]}, 借书时间:{record[3]}, 归还期限:{record[4]}, 状态:{record[5]}")
                     else:
                         print("未找到对应的图书信息")
-                    overtime_flag = 0  # 如果有超期书，将标志设置为0
+                    overtime_flag = 2  # 如果有超期书，将标志设置为0
 
         cur.close()
         conn.close()
@@ -51,9 +51,10 @@ class User:
 
         # 判断是否有超期书
         overtime_flag = User.overtime(user_id)
-        if overtime_flag == 0:
+        if overtime_flag == 2:
             print("你有超期图书未归还，请归还后才能借阅")
             return
+
 
         # 判断已借图书数量是否超过限制
         row = cur.execute("SELECT COUNT(*) FROM borrowed_books WHERE user_id=?", (user_id,)).fetchone()

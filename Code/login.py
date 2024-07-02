@@ -1,16 +1,19 @@
+import os
 import sqlite3
 
 from user import User
 from adminer import Adminer
 
 def getconnection():
-    dbstring="E:\Code\Python\专业综合训练Ⅱ\library\library.db"
-    conn=sqlite3.connect(dbstring)
+    dbstring = r"../library/library.db"  # 相对路径
+    base_dir = os.path.dirname(os.path.abspath(__file__))  # 获取当前文件所在目录
+    db_path = os.path.join(base_dir, dbstring)  # 构建相对路径的绝对路径
+    conn = sqlite3.connect(db_path)
     return conn
 
 def loggin():
     while True :
-
+        print("**************登录***************")
         print("1.用户     2.管理员     3.退出")
         print("请输入登录身份")
         a=int(input())

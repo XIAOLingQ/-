@@ -15,7 +15,6 @@ def updatastatus():
             ELSE '未超期'
         END
     ''', (current_date,))
-
     conn.commit()
     conn.close()
 

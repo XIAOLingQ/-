@@ -199,14 +199,54 @@ def init_routes(app):
 
         return jsonify({"message": "还书成功"}), 200
 
-    @app.route('/query', methods=['GET', 'POST'])
+    @app.route('/query_book', methods=['GET','POST'])
     def query_book():
         if request.method == 'GET':
             return render_template('query_book.html')
-        book_id = request.form.get('book_id')
-        # 在这里处理查询图书信息和状态的逻辑
-        flash(f"查询图书 {book_id} 信息", "success")
-        return redirect(url_for('user'))
+
+
+        data = request.get_json()
+        op = data.get('op')
+        if not op:
+            return jsonify({"error": "Missing query parameter"}), 400
+
+        conn = get_connection()
+        if not conn:
+            return jsonify({"error": "Database connection failed"}), 500
+
+        try:
+            cur = conn.cursor()
+
+            if op.isdigit():
+                record = cur.execute("SELECT * FROM books WHERE id=?", (op,)).fetchone()
+            else:
+                record = cur.execute("SELECT * FROM books WHERE title=?", (op,)).fetchone()
+
+            if record:
+                book_id = record[0]
+                copies = querycopy(book_id)
+                cur.close()
+                conn.close()
+                return jsonify({
+                    "book": {
+                        "id": record[0],
+                        "title": record[1],
+                        "author": record[2],
+                        "publisher": record[3]
+                    },
+                    "copies": copies
+                })
+            else:
+                cur.close()
+                conn.close()
+                return jsonify({"error": "Book not found"}), 404
+        except Exception as e:
+            print(f"Error querying book: {e}")
+            return jsonify({"error": "An error occurred"}), 500
+
+    @app.route('/query_book_logout', methods=['POST', 'GET'])
+    def query_book_logout():
+            return redirect(url_for('user'))
 
     @app.route('/query_borrowed', methods=['GET', 'POST'])
     def query_borrowed_books():

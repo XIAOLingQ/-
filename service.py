@@ -151,3 +151,11 @@ def borrow_book_by_id(user_id, book_id):
     cur.close()
     conn.close()
     return True
+
+def querycopy(book_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    copies = cur.execute("SELECT copies FROM books WHERE id=?", (book_id,)).fetchall()
+    cur.close()
+    conn.close()
+    return copies

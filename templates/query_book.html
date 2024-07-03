@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Library Query</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f5f5f5;
+        }
+        #container {
+            width: 60%;
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        input, button {
+            padding: 10px;
+            margin: 10px;
+            width: 80%;
+            font-size: 16px;
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div id="container">
+        <h1>查询图书信息</h1>
+        <input type="text" id="query" placeholder="请输入图书编号或名字">
+        <button onclick="queryBook()">查询</button>
+        <button onclick="logout()">退出</button>
+        <div id="result" class="result"></div>
+    </div>
+    <script>
+        async function queryBook() {
+            const query = document.getElementById('query').value;
+            const response = await fetch('/query_book', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ op: query })
+            });
+            const data = await response.json();
+            const resultDiv = document.getElementById('result');
+            if (data.error) {
+                resultDiv.innerHTML = `<p style="color: red;">${data.error}</p>`;
+            } else {
+                const book = data.book;
+                const copies = data.copies;
+                let copiesHtml = '<ul>';
+                copies.forEach(copy => {
+                    copiesHtml += `<li>副本数量：${copy[0]}</li>`;
+                });
+                copiesHtml += '</ul>';
+                resultDiv.innerHTML = `
+                    <h2>书籍信息</h2>
+                    <p>书籍编号: ${book.id}</p>
+                    <p>书名: ${book.title}</p>
+                    <p>作者: ${book.author}</p>
+                    <p>出版社: ${book.publisher}</p>
+                    <h3>副本信息</h3>
+                    ${copiesHtml}
+                `;
+            }
+        }
+        function logout() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/query_book_logout', true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    window.location.href = '/borrow_logout';
+                }
+            };
+
+            xhr.send();
+        }
+    </script>
+</body>
+</html>

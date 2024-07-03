@@ -194,15 +194,21 @@ class User:
         conn = getconn()
         cur = conn.cursor()
         op = input("请输入图书编号或名字查询：")
-        if op.isdigit():
-            record = cur.execute("SELECT * FROM books WHERE id=?", (op,)).fetchone()
-            querycopy(op)
-        else:
-            record = cur.execute("SELECT * FROM books WHERE title=?", (op,)).fetchone()
-            querycopy(record[0])
-        cur.close()
-        conn.close()
+        try:
+            if op.isdigit():
+                record = cur.execute("SELECT * FROM books WHERE id=?", (op,)).fetchone()
+            else:
+                record = cur.execute("SELECT * FROM books WHERE title=?", (op,)).fetchone()
 
+            if record:
+                querycopy(record[0])
+            else:
+                print("未找到对应的图书信息")
+        except Exception as e:
+            print(f"查询过程中发生错误: {e}")
+        finally:
+            cur.close()
+            conn.close()
 
 
 
@@ -227,7 +233,7 @@ def querycopy(number):
     records = cur.execute("SELECT * FROM books WHERE id=?", (number,)).fetchall()
     for record in records:
         status = "在库" if record[6] > 0 else "不在库"
-        print(f"副本{record[0]}本 状态：{status}")
+        print(f"副本{record[6]}本 状态：{status}")
     cur.close()
     conn.close()
 

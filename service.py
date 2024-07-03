@@ -1,0 +1,153 @@
+# 假设这些函数已经实现了所需的数据库操作
+from datetime import datetime, timedelta
+
+from db import get_connection
+def has_overdue_books(user_id):
+    """
+        检查用户是否有超期未归还的图书
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    records = cur.execute("SELECT * FROM borrowed_books WHERE user_id=?", (user_id,)).fetchall()
+    if not records:
+        return 0  # 如果没有借阅记录，返回0
+
+    today = datetime.today().date()
+    overtime_flag = 1
+    for record in records:
+        if len(record) >= 7 and record[4] is not None and record[6] == 0:
+            due_date = datetime.strptime(record[4], '%Y-%m-%d').date()
+            if today > due_date:
+                book_info = cur.execute("SELECT id, title FROM books WHERE id=?", (record[2],)).fetchone()
+                if book_info:
+                    print(
+                        f"图书编号:{book_info[0]}, 图书名字:{book_info[1]}, 借书时间:{record[3]}, 归还期限:{record[4]}, 状态:{record[5]}")
+                else:
+                    print("未找到对应的图书信息")
+                overtime_flag = 2  # 如果有超期书，将标志设置为0
+    cur.close()
+    conn.close()
+    return overtime_flag  # 返回超期状态
+
+
+def count_borrowed_books(user_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    row = cur.execute("SELECT COUNT(*) FROM borrowed_books WHERE user_id=?", (user_id,)).fetchone()
+    if row[0] >= 2:
+        return  True
+    else:
+        return False
+
+def book_exists_by_name(book_name):
+    conn = get_connection()
+    cur = conn.cursor()
+    result = cur.execute("SELECT title FROM books WHERE title=?", (book_name,)).fetchone()
+    if result is None:
+        print("没有找到该图书")
+        cur.close()
+        conn.close()
+        return True
+    else:
+        return False
+
+def book_exists_by_id(book_id):
+    conn = get_connection()
+    cur = conn.cursor()
+    result = cur.execute("SELECT id FROM books WHERE id=?", (book_id,)).fetchone()
+    if result is None:
+        print("没有找到该图书")
+        cur.close()
+        conn.close()
+        return True
+    else:
+        return False
+
+
+def borrow_book_by_name(user_id, book_name):
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # 检查是否存在该图书名
+    result = cur.execute("SELECT id, copies FROM books WHERE title=?", (book_name,)).fetchone()
+    if result is None:
+        print("没有找到该图书名")
+        cur.close()
+        conn.close()
+        return False
+
+    book_id, available_copies = result
+    if available_copies <= 0:
+        print("该书已经没有副本可以借阅，请选择其他书籍")
+        cur.close()
+        conn.close()
+        return False
+
+    borrow_date = datetime.now().date()
+    return_date = borrow_date + timedelta(days=30)
+    print(f"还书期限是30天，到期时间是：{return_date.strftime('%Y-%m-%d')}")
+
+    # 更新数据库，减少可借阅的副本数量
+    cur.execute("UPDATE books SET copies = copies - 1 WHERE id = ?", (book_id,))
+
+    # 查找 borrowed_books 表中的最大 ID
+    cur.execute("SELECT MAX(id) FROM borrowed_books")
+    max_id = cur.fetchone()[0]
+    if max_id is None:
+        max_id = 0
+
+    # 将借阅信息插入到 borrowed_books 表
+    cur.execute(
+        "INSERT INTO borrowed_books (id, user_id, book_id, borrow_date, return_date, status) VALUES (?, ?, ?, ?, ?, ?)",
+        (max_id + 1, user_id, book_id, borrow_date.strftime('%Y-%m-%d'), return_date.strftime('%Y-%m-%d'), "未超期")
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True
+
+
+def borrow_book_by_id(user_id, book_id):
+    print(user_id)
+    conn = get_connection()
+    cur = conn.cursor()
+
+    # 检查是否存在该图书名
+    result = cur.execute("SELECT id, copies FROM books WHERE id=?", (book_id,)).fetchone()
+    if result is None:
+        print("没有找到该图书编号")
+        cur.close()
+        conn.close()
+        return False
+
+    book_id, available_copies = result
+    if available_copies <= 0:
+        print("该书已经没有副本可以借阅，请选择其他书籍")
+        cur.close()
+        conn.close()
+        return False
+
+    borrow_date = datetime.now().date()
+    return_date = borrow_date + timedelta(days=30)
+    print(f"还书期限是30天，到期时间是：{return_date.strftime('%Y-%m-%d')}")
+
+    # 更新数据库，减少可借阅的副本数量
+    cur.execute("UPDATE books SET copies = copies - 1 WHERE id = ?", (book_id,))
+
+    # 查找 borrowed_books 表中的最大 ID
+    cur.execute("SELECT MAX(id) FROM borrowed_books")
+    max_id = cur.fetchone()[0]
+    if max_id is None:
+        max_id = 0
+
+    # 将借阅信息插入到 borrowed_books 表
+    cur.execute(
+        "INSERT INTO borrowed_books (id, user_id, book_id, borrow_date, return_date, status) VALUES (?, ?, ?, ?, ?, ?)",
+        (max_id + 1, user_id, book_id, borrow_date.strftime('%Y-%m-%d'), return_date.strftime('%Y-%m-%d'), "未超期")
+    )
+
+    conn.commit()
+    cur.close()
+    conn.close()
+    return True

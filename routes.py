@@ -261,6 +261,26 @@ def init_routes(app):
     def query_borrowed_books_logout():
         return redirect(url_for('user'))
 
+    @app.route('/bookInput', methods=['POST', 'GET'])
+    def bookInput():
+        return render_template('bookInput.html')
+
+    @app.route('/bookModify', methods=['POST', 'GET'])
+    def bookModify():
+        return render_template('bookModify.html')
+
+    @app.route('/bookDel', methods=['POST', 'GET'])
+    def bookDel():
+        return render_template('bookDel.html')
+
+    @app.route('/bookSearch', methods=['POST', 'GET'])
+    def bookSearch():
+        return render_template('bookSearch.html')
+
+    @app.route('/userSearch', methods=['POST', 'GET'])
+    def userSearch():
+        return render_template('userSearch.html')
+
 
     @app.route('/logout')
     def logout():

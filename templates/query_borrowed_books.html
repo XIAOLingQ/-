@@ -38,5 +38,20 @@
     {% else %}
         <p>信息为空，还未借书</p>
     {% endif %}
+    <button onclick="logout()">退出</button>
 </body>
+<script>
+    function logout() {
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/query_borrowed_books_logout', true);
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4 && xhr.status === 200) {
+                    window.location.href = '/query_borrowed_books_logout';
+                }
+            };
+
+            xhr.send();
+        }
+</script>
 </html>

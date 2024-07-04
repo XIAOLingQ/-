@@ -257,6 +257,11 @@ def init_routes(app):
         borrowed_books = querymybook(user_id)
         return render_template('query_borrowed_books.html', borrowed_books=borrowed_books)
 
+    @app.route('/query_borrowed_books_logout', methods=['POST', 'GET'])
+    def query_borrowed_books_logout():
+        return redirect(url_for('user'))
+
+
     @app.route('/logout')
     def logout():
         # 在这里处理退出逻辑

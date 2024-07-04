@@ -248,14 +248,14 @@ def init_routes(app):
     def query_book_logout():
             return redirect(url_for('user'))
 
-    @app.route('/query_borrowed', methods=['GET', 'POST'])
+    @app.route('/query_borrowed_books', methods=['GET', 'POST'])
     def query_borrowed_books():
-        if request.method == 'GET':
-            return render_template('query_borrowed_books.html')
-        user_id = request.form.get('user_id')
-        # 在这里处理查询已借图书信息和状态的逻辑
-        flash(f"查询用户 {user_id} 已借图书信息", "success")
-        return redirect(url_for('user'))
+        user_id = session.get('user_id')
+        if not user_id:
+            return "User not logged in", 401
+
+        borrowed_books = querymybook(user_id)
+        return render_template('query_borrowed_books.html', borrowed_books=borrowed_books)
 
     @app.route('/logout')
     def logout():

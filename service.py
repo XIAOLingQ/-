@@ -1,5 +1,6 @@
 # 假设这些函数已经实现了所需的数据库操作
 from datetime import datetime, timedelta
+import re
 
 from db import get_connection
 def has_overdue_books(user_id):
@@ -159,3 +160,62 @@ def querycopy(book_id):
     cur.close()
     conn.close()
     return copies
+
+
+def querymybook(user_id):
+    """
+    查询用户已借图书信息和状态
+    """
+    conn = get_connection()
+    cur = conn.cursor()
+    records = cur.execute("SELECT * FROM borrowed_books WHERE user_id=?", (user_id,)).fetchall()
+    today = datetime.today().date()  # 获取今天的日期（不包括时间部分）
+
+    book_list = []
+
+    for record in records:
+        if record[4] is not None:
+            # 使用正则表达式去除时间部分
+            date_part = re.split(r'[ ]', record[4])[0]
+            due_date = datetime.strptime(date_part, '%Y-%m-%d').date()
+
+            # 计算是否超期
+            if today > due_date:
+                overdue_days = (today - due_date).days
+                status = f"已超期{overdue_days}天"
+            else:
+                status = "未超期"
+
+            # 获取图书信息并存入列表
+            book_info = cur.execute("SELECT * FROM books WHERE id=?", (record[2],)).fetchone()
+            if book_info:
+                book_list.append({
+                    'book_id': book_info[0],
+                    'book_name': book_info[1],
+                    'author': book_info[2],
+                    'publisher': book_info[3],
+                    'publish_date': book_info[4],
+                    'price': book_info[5],
+                    'copy_id': book_info[0],
+                    'borrow_date': record[3],
+                    'due_date': record[4],
+                    'status': status
+                })
+            else:
+                book_list.append({
+                    'book_id': None,
+                    'book_name': '未找到对应的图书信息',
+                    'author': '',
+                    'publisher': '',
+                    'publish_date': '',
+                    'price': '',
+                    'copy_id': '',
+                    'borrow_date': '',
+                    'due_date': '',
+                    'status': ''
+                })
+
+    cur.close()
+    conn.close()
+
+    return book_list

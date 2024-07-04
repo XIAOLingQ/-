@@ -19,7 +19,7 @@ def init_routes(app):
     def before_request():
         allowed_routes = ['index', 'login']
         if request.endpoint not in allowed_routes and 'user_id' not in session:
-            flash('请先登录', 'danger')
+            # flash('请先登录', 'danger')
             return redirect(url_for('login'))
 
     @app.route('/', methods=['GET', 'POST'])

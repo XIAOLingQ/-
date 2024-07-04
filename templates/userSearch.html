@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Search User Borrowed Books</title>
+    <title>查询任意用户借书状态</title>
     <style>
         .success { color: green; }
         .danger { color: red; }
@@ -14,16 +14,7 @@
     </style>
 </head>
 <body>
-    <h1>Search User Borrowed Books</h1>
-    {% with messages = get_flashed_messages(with_categories=true) %}
-        {% if messages %}
-            <script>
-                {% for category, message in messages %}
-                    alert("{{ message }}");
-                {% endfor %}
-            </script>
-        {% endif %}
-    {% endwith %}
+    <h1>查询任意用户借书状态</h1>
     <form method="post">
         <label for="user_id">用户ID:</label>
         <input type="number" id="user_id" name="user_id" required><br>
@@ -31,36 +22,46 @@
     </form>
     <button onclick="logout()">退出</button>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul class="flashes">
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+
     {% if borrowed_books %}
-        <h2>借阅信息:</h2>
-        <table>
+    <h2>借阅信息:</h2>
+    <table>
+        <tr>
+            <th>图书编号</th>
+            <th>书名</th>
+            <th>作者</th>
+            <th>出版社</th>
+            <th>出版日期</th>
+            <th>价格</th>
+            <th>副本数量</th>
+            <th>借书时间</th>
+            <th>归还期限</th>
+            <th>状态</th>
+        </tr>
+        {% for book in borrowed_books %}
             <tr>
-                <th>图书编号</th>
-                <th>书名</th>
-                <th>作者</th>
-                <th>出版社</th>
-                <th>出版日期</th>
-                <th>价格</th>
-                <th>副本数量</th>
-                <th>借书时间</th>
-                <th>归还期限</th>
-                <th>状态</th>
+                <td>{{ book.book_id }}</td>
+                <td>{{ book.title }}</td>
+                <td>{{ book.author }}</td>
+                <td>{{ book.publisher }}</td>
+                <td>{{ book.pub_date }}</td>
+                <td>{{ book.price }}</td>
+                <td>{{ book.copies }}</td>
+                <td>{{ book.borrow_date }}</td>
+                <td>{{ book.due_date }}</td>
+                <td>{{ book.status }}</td>
             </tr>
-            {% for book in borrowed_books %}
-                <tr>
-                    <td>{{ book.book_id }}</td>
-                    <td>{{ book.title }}</td>
-                    <td>{{ book.author }}</td>
-                    <td>{{ book.publisher }}</td>
-                    <td>{{ book.pub_date }}</td>
-                    <td>{{ book.price }}</td>
-                    <td>{{ book.copies }}</td>
-                    <td>{{ book.borrow_date }}</td>
-                    <td>{{ book.due_date }}</td>
-                    <td>{{ book.status }}</td>
-                </tr>
-            {% endfor %}
-        </table>
+        {% endfor %}
+    </table>
     {% endif %}
 
     <script>

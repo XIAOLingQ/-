@@ -59,16 +59,7 @@
         }
 
         function logout() {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/borrow_logout', true);
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    window.location.href = '/borrow_logout';
-                }
-            };
-
-            xhr.send();
+            window.location.href = '/user';
         }
 
         window.onload = function() {

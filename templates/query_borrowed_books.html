@@ -42,16 +42,7 @@
 </body>
 <script>
     function logout() {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/query_borrowed_books_logout', true);
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    window.location.href = '/query_borrowed_books_logout';
-                }
-            };
-
-            xhr.send();
+            window.location.href = '/user';
         }
 </script>
 </html>

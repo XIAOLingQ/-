@@ -2,9 +2,71 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Search User Borrowed Books</title>
+    <style>
+        .success { color: green; }
+        .danger { color: red; }
+        .info { color: blue; }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
 </head>
 <body>
+    <h1>Search User Borrowed Books</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                {% for category, message in messages %}
+                    alert("{{ message }}");
+                {% endfor %}
+            </script>
+        {% endif %}
+    {% endwith %}
+    <form method="post">
+        <label for="user_id">用户ID:</label>
+        <input type="number" id="user_id" name="user_id" required><br>
+        <input type="submit" value="查询">
+    </form>
+    <button onclick="logout()">退出</button>
 
+    {% if borrowed_books %}
+        <h2>借阅信息:</h2>
+        <table>
+            <tr>
+                <th>图书编号</th>
+                <th>书名</th>
+                <th>作者</th>
+                <th>出版社</th>
+                <th>出版日期</th>
+                <th>价格</th>
+                <th>副本数量</th>
+                <th>借书时间</th>
+                <th>归还期限</th>
+                <th>状态</th>
+            </tr>
+            {% for book in borrowed_books %}
+                <tr>
+                    <td>{{ book.book_id }}</td>
+                    <td>{{ book.title }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>{{ book.publisher }}</td>
+                    <td>{{ book.pub_date }}</td>
+                    <td>{{ book.price }}</td>
+                    <td>{{ book.copies }}</td>
+                    <td>{{ book.borrow_date }}</td>
+                    <td>{{ book.due_date }}</td>
+                    <td>{{ book.status }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <script>
+        function logout() {
+            window.location.href = '/adminer';
+        }
+    </script>
 </body>
 </html>

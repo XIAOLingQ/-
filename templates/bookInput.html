@@ -14,7 +14,8 @@
         {% if messages %}
             <ul>
                 {% for category, message in messages %}
-                    <li class="{{ category }}">{{ message }}</li>
+                    <li class="
+                    {{ category }}">{{ message }}</li>
                 {% endfor %}
             </ul>
         {% endif %}
@@ -44,16 +45,7 @@
 </body>
 <script>
     function logout() {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/bookInput_logout', true);
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    window.location.href = '/bookInput_logout';
-                }
-            };
-
-            xhr.send();
-        }
+        window.location.href = '/adminer';
+    }
 </script>
 </html>

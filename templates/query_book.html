@@ -83,16 +83,7 @@
             }
         }
         function logout() {
-            const xhr = new XMLHttpRequest();
-            xhr.open('POST', '/query_book_logout', true);
-
-            xhr.onreadystatechange = function () {
-                if (xhr.readyState === 4 && xhr.status === 200) {
-                    window.location.href = '/borrow_logout';
-                }
-            };
-
-            xhr.send();
+            window.location.href = '/user';
         }
     </script>
 </body>

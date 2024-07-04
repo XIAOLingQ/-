@@ -2,9 +2,52 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Modify a Book</title>
+    <style>
+        .success { color: green; }
+        .danger { color: red; }
+    </style>
 </head>
 <body>
+    <h1>Modify a Book</h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <ul>
+                {% for category, message in messages %}
+                    <li class="{{ category }}">{{ message }}</li>
+                {% endfor %}
+            </ul>
+        {% endif %}
+    {% endwith %}
+    <form method="post">
+        <label for="book_name">要修改的图书名:</label>
+        <input type="text" id="book_name" name="book_name" required><br>
 
+        <label for="id">新的ID:</label>
+        <input type="number" id="id" name="id" required><br>
+
+        <label for="author">新的作者:</label>
+        <input type="text" id="author" name="author" required><br>
+
+        <label for="publisher">新的出版社:</label>
+        <input type="text" id="publisher" name="publisher" required><br>
+
+        <label for="pub_date">新的出版日期:</label>
+        <input type="date" id="pub_date" name="pub_date" required><br>
+
+        <label for="price">新的价格:</label>
+        <input type="number" id="price" name="price" required><br>
+
+        <label for="copies">新的副本:</label>
+        <input type="number" id="copies" name="copies" required><br>
+
+        <input type="submit" value="修改图书">
+    </form>
+    <button onclick="logout()">退出</button>
 </body>
+<script>
+    function logout() {
+        window.location.href = '/adminer';
+    }
+</script>
 </html>

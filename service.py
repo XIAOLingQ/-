@@ -217,5 +217,5 @@ def querymybook(user_id):
 
     cur.close()
     conn.close()
-
     return book_list
+

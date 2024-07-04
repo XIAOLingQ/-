@@ -28,8 +28,13 @@ class Adminer:
                 print("请输入一个有效的数字")
                 amount = 0
         for i in range(amount):
+            cur.execute("SELECT MAX(id) FROM books")
+            max_id = cur.fetchone()[0]
+            if max_id is None:
+                new_id = 1
+            else:
+                new_id = max_id + 1
             print(f"第{i + 1}本书的信息:")
-            id = input("The book_ID is:")
             title = input("The book_name is:")
             author = input("The book_author is:")
             publisher = input("The book_publisher is:")
@@ -38,7 +43,7 @@ class Adminer:
             copies = input("The copies is:")
             try:
                 cur.execute("insert into books(id,title,author,publisher,pub_date,price,copies)"
-                            "values(?,?,?,?,?,?,?)", (id, title, author, publisher, pub_date, price, copies))
+                            "values(?,?,?,?,?,?,?)", (new_id, title, author, publisher, pub_date, price, copies))
             except sqlite3.Error as e:
                 print("An error occurred:", e)
 

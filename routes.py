@@ -1,5 +1,7 @@
 import json
 import re  # 导入正则表达式模块
+import sqlite3
+
 from flask import request, redirect, render_template, url_for, flash, jsonify, session, make_response
 from service import *
 
@@ -246,7 +248,7 @@ def init_routes(app):
 
     @app.route('/query_book_logout', methods=['POST', 'GET'])
     def query_book_logout():
-            return redirect(url_for('user'))
+            return redirect(url_for('adminer'))
 
     @app.route('/query_borrowed_books', methods=['GET', 'POST'])
     def query_borrowed_books():
@@ -263,7 +265,39 @@ def init_routes(app):
 
     @app.route('/bookInput', methods=['POST', 'GET'])
     def bookInput():
+        if request.method == 'POST':
+            title = request.form['book_name']
+            author = request.form['book_author']
+            publisher = request.form['book_publisher']
+            pub_date = request.form['pub_date']
+            price = request.form['book_price']
+            copies = request.form['copies']
+
+            try:
+                conn = get_connection()
+                cur = conn.cursor()
+                # 获取最大book_id并加1
+                cur.execute("SELECT MAX(id) FROM books")
+                max_id = cur.fetchone()[0]
+                if max_id is None:
+                    new_id = 1
+                else:
+                    new_id = max_id + 1
+
+                cur.execute(
+                    "INSERT INTO books (id, title, author, publisher, pub_date, price, copies) VALUES (?, ?, ?, ?, ?, ?, ?)",
+                    (new_id, title, author, publisher, pub_date, price, copies))
+                conn.commit()
+                conn.close()
+                flash('添加图书成功!', 'success')
+            except sqlite3.Error as e:
+                flash(f"An error occurred: {e}", 'danger')
+
         return render_template('bookInput.html')
+
+    @app.route('/bookInput_logout', methods=['POST', 'GET'])
+    def bookInput_logout():
+        return redirect(url_for('adminer'))
 
     @app.route('/bookModify', methods=['POST', 'GET'])
     def bookModify():
@@ -281,11 +315,8 @@ def init_routes(app):
     def userSearch():
         return render_template('userSearch.html')
 
-
     @app.route('/logout')
     def logout():
         # 在这里处理退出逻辑
         flash("已退出登录", "success")
         return redirect(url_for('login'))
-
-

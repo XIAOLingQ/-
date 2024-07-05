@@ -6,7 +6,6 @@ def getconn():
     # 连接数据库的函数，请根据实际情况修改
     return sqlite3.connect('../library/library.db')
 
-
 class User:
     def __init__(self, user_id, name):
         self.user_id = user_id

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>我的借阅图书</title>
+</head>
+<body>
+    <h1>我的借阅图书</h1>
+    {% if borrowed_books %}
+        <table border="1">
+            <tr>
+                <th>图书编号</th>
+                <th>图书名字</th>
+                <th>作者</th>
+                <th>出版社</th>
+                <th>出版时间</th>
+                <th>价格</th>
+                <th>副本编号</th>
+                <th>借书时间</th>
+                <th>归还期限</th>
+                <th>状态</th>
+            </tr>
+            {% for book in borrowed_books %}
+                <tr>
+                    <td>{{ book.book_id }}</td>
+                    <td>{{ book.book_name }}</td>
+                    <td>{{ book.author }}</td>
+                    <td>{{ book.publisher }}</td>
+                    <td>{{ book.publish_date }}</td>
+                    <td>{{ book.price }}</td>
+                    <td>{{ book.copy_id }}</td>
+                    <td>{{ book.borrow_date }}</td>
+                    <td>{{ book.due_date }}</td>
+                    <td>{{ book.status }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% else %}
+        <p>信息为空，还未借书</p>
+    {% endif %}
+    <button onclick="logout()">退出</button>
+</body>
+<script>
+    function logout() {
+            window.location.href = '/user';
+        }
+</script>
+</html>

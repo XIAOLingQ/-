@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <title>借阅图书</title>
+    <script>
+        function borrowBook() {
+            const borrowMethod = document.getElementById('borrowMethod').value;
+            let bookData = {};
+
+            if (borrowMethod === 'byName') {
+                const bookName = document.getElementById('bookName').value;
+                if (!bookName) {
+                    alert('请输入图书名称');
+                    return;
+                }
+                bookData = { book_name: bookName };
+            } else if (borrowMethod === 'byId') {
+                const bookId = document.getElementById('bookId').value;
+                if (!bookId) {
+                    alert('请输入图书编号');
+                    return;
+                }
+                bookData = { book_id: bookId };
+            }
+
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/borrow', true);
+            xhr.setRequestHeader('Content-Type', 'application/json');
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    if (xhr.status === 200) {
+                        alert('借阅成功');
+                    } else if (xhr.status === 403) {
+                        alert('您有超期未还的书籍，不能继续借阅');
+                    } else if (xhr.status === 404) {
+                        alert('未找到相关图书');
+                    } else if (xhr.status === 409) {
+                        alert('您已借出两本书籍，不能继续借阅');
+                    } else {
+                        alert('借阅失败，请重试');
+                    }
+                }
+            };
+
+            xhr.send(JSON.stringify(bookData));
+        }
+
+        function updateInputFields() {
+            const borrowMethod = document.getElementById('borrowMethod').value;
+            if (borrowMethod === 'byName') {
+                document.getElementById('byNameInput').style.display = 'block';
+                document.getElementById('byIdInput').style.display = 'none';
+            } else if (borrowMethod === 'byId') {
+                document.getElementById('byNameInput').style.display = 'none';
+                document.getElementById('byIdInput').style.display = 'block';
+            }
+        }
+
+        function logout() {
+            window.location.href = '/user';
+        }
+
+        window.onload = function() {
+            updateInputFields();
+        };
+    </script>
+</head>
+<body>
+    <h1>借阅图书</h1>
+    <form onsubmit="event.preventDefault(); borrowBook();">
+        <label for="borrowMethod">借阅方式:</label>
+        <select id="borrowMethod" onchange="updateInputFields()">
+            <option value="byName">通过图书名称</option>
+            <option value="byId">通过图书编号</option>
+        </select>
+        <div id="byNameInput" style="display: none;">
+            <label for="bookName">图书名称:</label>
+            <input type="text" id="bookName" name="bookName">
+        </div>
+        <div id="byIdInput" style="display: none;">
+            <label for="bookId">图书编号:</label>
+            <input type="text" id="bookId" name="bookId">
+        </div>
+        <button type="submit">借阅</button>
+    </form>
+    <button onclick="logout()">退出</button>
+</body>
+</html>

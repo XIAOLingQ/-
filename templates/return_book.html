@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>还书</title>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            fetch('/myborrowbooks')
+                .then(response => response.json())
+                .then(data => {
+                    const booksList = document.getElementById('booksList');
+                    booksList.innerHTML = '';
+                    data.forEach(book => {
+                        const option = document.createElement('option');
+                        option.value = book.book_id;
+                        option.textContent = `${book.title}（${book.author}） - ${book.status}`;
+                        booksList.appendChild(option);
+                    });
+                })
+                .catch(error => console.error('Error fetching books:', error));
+        });
+
+        function handleSubmit(event) {
+            event.preventDefault();  // 防止默认表单提交
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: form.method,
+                body: formData
+            })
+            .then(response => response.json())
+            .then(data => {
+                alert(data.message);  // 显示提示消息
+                if (data.message === "还书成功") {
+                    window.location.href = 'return';
+                }
+            })
+            .catch(error => console.error('Error submitting form:', error));
+        }
+        function logout() {
+            window.location.href = '/user';
+        }
+
+    </script>
+</head>
+<body>
+    <h2>还书</h2>
+    <form action="/return" method="POST" onsubmit="handleSubmit(event)">
+        <label for="booksList">请选择要还的书籍：</label>
+        <select id="booksList" name="book_ids" multiple size="10" data-width="10px">
+            <!-- 书籍选项将被动态插入这里 -->
+        </select>
+        <button type="submit">还书</button>
+    </form>
+    <p id="message"></p>
+    <button onclick="logout()">退出</button>
+</body>
+</html>

@@ -6,51 +6,96 @@
     <title>Login</title>
     <style>
         body {
-            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: linear-gradient(to right, #edddff, #bfd4f1);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* 使用视口高度填满整个屏幕 */
         }
-        .container {
-            max-width: 400px;
-            margin: 50px auto;
+
+        .login-container {
+            background-color: #fff;
             padding: 20px;
-            border: 1px solid #ccc;
             border-radius: 10px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 358px; /* 设置表单容器的宽度 */
         }
+
+        h5 {
+            font-size: 30px;
+            color: #333;
+            background-color: transparent;
+            margin-bottom: 20px; /* 留出一些空间 */
+        }
+
+        form {
+            text-align: left; /* 将表单内元素左对齐 */
+        }
+
         label, input, select {
             display: block;
             width: 100%;
             margin-bottom: 10px;
+            font-size: 18px; /* 调整表单元素的字体大小 */
         }
+
         input[type="submit"] {
             width: auto;
             cursor: pointer;
+            padding: 10px 20px;
+            background-image: linear-gradient(to right, #a6c1ee, #fbc2eb);
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
         }
+
         .msg {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 16px;
             color: red;
+        }
+
+        a {
+            text-decoration: none;
+            color: #abc1ee;
+            margin-top: 10px;
+            display: inline-block;
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <h1>Login</h1>
-        <form method="post" action="/login">
-            <label for="user">Username:</label>
-            <input type="text" id="user" name="user" required>
+<div>
 
-            <label for="pwd">Password:</label>
-            <input type="password" id="pwd" name="pwd" required>
+    <div class="login-container">
+    <h5>图书馆管理系统</h5>
+    <h1>Login</h1>
+    <form method="post" action="/login">
+    <label for="role">Role:</label>
+        <select id="role" name="role" required>
+            <option value="user">User</option>
+            <option value="adminer">Administrator</option>
+        </select>
+        <label for="user">Username:</label>
+        <input type="text" id="user" name="user" required>
 
-            <label for="role">Role:</label>
-            <select id="role" name="role" required>
-                <option value="user">User</option>
-                <option value="adminer">Administrator</option>
-            </select>
+        <label for="pwd">Password:</label>
+        <input type="password" id="pwd" name="pwd" required>
 
-            <input type="submit" value="Login">
-            {% if msg %}
-            <p class="msg">{{ msg }}</p>
-            {% endif %}
-        </form>
-    </div>
+
+
+        <input type="submit" value="Login">
+        {% if msg %}
+        <p class="msg">{{ msg }}</p>
+        {% endif %}
+    </form>
+</div>
+</div>
+
+
 </body>
 </html>

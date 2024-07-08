@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Search for a Book</title>
+    <style>
+        .success { color: green; }
+        .danger { color: red; }
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+        }
+    </style>
+</head>
+<body>
+    <h1>查询图书信息 </h1>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <script>
+                {% for category, message in messages %}
+                    alert("{{ message }}");
+                {% endfor %}
+            </script>
+        {% endif %}
+    {% endwith %}
+    <form method="post">
+        <label for="search_type">选择查询方式:</label>
+        <select id="search_type" name="search_type" required>
+            <option value="id">按图书编号</option>
+            <option value="title">按图书名称</option>
+            <option value="all">总览图书馆所有图书</option>
+        </select><br>
+
+        <div id="id_input" style="display: none;">
+            <label for="book_id">图书编号:</label>
+            <input type="number" id="book_id" name="book_id"><br>
+        </div>
+
+        <div id="title_input" style="display: none;">
+            <label for="book_title">图书名称:</label>
+            <input type="text" id="book_title" name="book_title"><br>
+        </div>
+
+        <input type="submit" value="查询图书">
+    </form>
+    <button onclick="logout()">退出</button>
+
+    {% if books %}
+        <h2>查询结果:</h2>
+        <table>
+            <tr>
+                <th>编号</th>
+                <th>书名</th>
+                <th>作者</th>
+                <th>出版社</th>
+                <th>出版日期</th>
+                <th>价格</th>
+                <th>副本数量</th>
+            </tr>
+            {% for book in books %}
+                <tr>
+                    <td>{{ book[0] }}</td>
+                    <td>{{ book[1] }}</td>
+                    <td>{{ book[2] }}</td>
+                    <td>{{ book[3] }}</td>
+                    <td>{{ book[4] }}</td>
+                    <td>{{ book[5] }}</td>
+                    <td>{{ book[6] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+    {% endif %}
+
+    <script>
+        document.getElementById('search_type').addEventListener('change', function() {
+            var method = this.value;
+            document.getElementById('id_input').style.display = method === 'id' ? 'block' : 'none';
+            document.getElementById('title_input').style.display = method === 'title' ? 'block' : 'none';
+        });
+
+        // 默认隐藏所有输入框
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('id_input').style.display = 'block';
+            document.getElementById('title_input').style.display = 'none';
+        });
+
+        function logout() {
+            window.location.href = '/user';
+        }
+    </script>
+</body>
+</html>

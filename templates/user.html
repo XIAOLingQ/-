@@ -24,11 +24,11 @@
         }
         .btn {
             display: block;
-            width: 100%;
+            width: 30%;
             padding: 10px;
-            margin: 10px 0;
+            margin: 10px 10px;
             text-align: center;
-            background-color: #007BFF;
+            background-color: #59a1e7;
             color: white;
             border: none;
             border-radius: 5px;
@@ -56,7 +56,7 @@
         <h1>用户界面</h1>
         <a class="btn" href="{{ url_for('borrow_book') }}">借阅图书</a>
         <a class="btn" href="{{ url_for('return_book') }}">归还图书</a>
-        <a class="btn" href="{{ url_for('query_book') }}">查询图书信息和状态</a>
+        <a class="btn" href="{{ url_for('bookSearch_user') }}">查询图书信息和状态</a>
         <a class="btn" href="{{ url_for('query_borrowed_books') }}">查询已借图书信息和状态</a>
 
         <!-- Logout Link -->

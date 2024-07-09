@@ -189,27 +189,70 @@ class User:
 
     @staticmethod
     def queryms():
-        """
-        查询图书信息和状态
-        """
         conn = getconn()
         cur = conn.cursor()
-        op = input("请输入图书编号或名字查询：")
-        try:
-            if op.isdigit():
-                record = cur.execute("SELECT * FROM books WHERE id=?", (op,)).fetchone()
-            else:
-                record = cur.execute("SELECT * FROM books WHERE title=?", (op,)).fetchone()
+        print("\n")
+        print("*************查询图书信息*************")
+        order = -1
+        while order == -1:
+            print("1.查询某本图书")
+            print("2.总览图书管所有图书")
+            print("3.退出")
+            order = int(input("请选择查询操作："))
+            if order == 1:
+                flag = -1
+                while flag == -1:
+                    print("1.按图书编号进行查询")
+                    print("2.按图书名称进行查询")
+                    print("3.退出")
+                    flag = int(input("请选择查询方式："))
+                    if flag == 1:
+                        id = int(input("请输入图书编号："))
+                        cur.execute("SELECT COUNT(*) FROM books WHERE id = ?", (id,))
+                        if cur.fetchone()[0] == 0:
+                            print(f"编号为{id}的图书不存在")
+                        else:
+                            cur.execute("select * from books where id =?", (id,))
+                            conn.commit()
+                            print(f"编号为{id}的图书信息如下：")
+                            for row in cur:
+                                print(
+                                    f"编号：{row[0]},书名：{row[1]},作者： {row[2]},出版社： {row[3]},出版日期：{row[4]},价格：{row[5]},副本数量：{row[6]}")
+                            cur.close()
+                            conn.close()
+                    elif flag == 2:
+                        title = input("请输入图书名称：")
+                        cur.execute("SELECT COUNT(*) FROM books WHERE title = ?", (title,))
+                        if cur.fetchone()[0] == 0:
+                            print(f"图书<<{title}>>不存在")
+                        else:
+                            cur.execute("select * from books where title =?", (title,))
+                            conn.commit()
+                            print(f"图书<<{title}>>的信息如下：")
+                            for row in cur:
+                                print(
+                                    f"编号：{row[0]},书名：{row[1]},作者： {row[2]},出版社： {row[3]},出版日期：{row[4]},价格：{row[5]},副本数量：{row[6]}")
+                            cur.close()
+                            conn.close()
 
-            if record:
-                querycopy(record[0])
+                    elif flag == 3:
+                        return
+                    else:
+                        flag = -1
+                        print("错误的输入，请重新选择！！！")
+            elif order == 2:
+                print("所有图书信息如下：")
+                cur.execute("select * from books ")
+                records = cur.fetchall()
+                for line in records:
+                    print(f"图书编号: {line[0]}, 书名: {line[1]}, 作者: {line[2]}, 出版社: {line[3]}, 出版日期: {line[4]},价格: {line[5]}, 副本数量: {line[6]}")
+                cur.close()
+                conn.close()
+            elif order == 3:
+                return
             else:
-                print("未找到对应的图书信息")
-        except Exception as e:
-            print(f"查询过程中发生错误: {e}")
-        finally:
-            cur.close()
-            conn.close()
+                order = -1
+                print("错误的输入，请重新选择！！！")
 
 
 

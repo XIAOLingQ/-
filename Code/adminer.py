@@ -183,7 +183,7 @@ class Adminer:
                 cur.execute("select * from books ")
                 records = cur.fetchall()
                 for line in records:
-                    print(line)
+                    print(f"图书编号: {line[0]}, 书名: {line[1]}, 作者: {line[2]}, 出版社: {line[3]}, 出版日期: {line[4]},价格: {line[5]}, 副本数量: {line[6]}")
                 cur.close()
                 conn.close()
             elif order == 3:
@@ -219,16 +219,22 @@ class Adminer:
                 cur.close()
                 conn.close()
 
+    def chech_borrowed_users(self):
+        conn = self.getConnection()
+        cur = conn.cursor()
+        cur.execute("SELECT bb.*,aa.name,cc.title FROM borrowed_books bb,user aa,books cc where bb.user_id = aa.id and bb.book_id =cc.id")
+        records = cur.fetchall()
+        for record in records:
+            print(
+                f"借书编号: {record[0]}, 姓名: {record[6]}, 书名: {record[7]}, 借书日期: {record[3]}, 还书日期: {record[4]},状态: {record[5]}")
+        cur.close()
+        conn.close()
+
+
 
 def menuadminer():
     print("**************管理员***************")
     print("1.录入图书信息     2.修改图书信息    3.删除图书信息")
-    print("4.查询图书信息     5.查询任意用户借书状态    6.退出")
+    print("4.查询图书信息     5.查询任意用户借书状态 6.查询所有用户的借书状态")
+    print("7.退出")
 
-
-if __name__ == "__main__":
-    admin = Adminer(user_id=1001, name="TOM")
-    # admin.bookInput()
-    # admin.bookModify()
-    # admin.bookDel()
-    # admin.bookSearch()

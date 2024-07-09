@@ -376,6 +376,48 @@ def init_routes(app):
                     flash(f"发生错误: {e}", 'danger')
         return render_template('bookSearch.html', books=books)
 
+
+    @app.route('/bookSearch_user', methods=['POST', 'GET'])
+    @login_required
+    def bookSearch_user():
+        books = []
+        if request.method == 'POST':
+            search_type = request.form['search_type']
+            if search_type == 'id':
+                book_id = request.form['book_id']
+                try:
+                    conn = get_connection()
+                    cur = conn.cursor()
+                    cur.execute("SELECT * FROM books WHERE id = ?", (book_id,))
+                    books = cur.fetchall()
+                    if not books:
+                        flash(f"编号为{book_id}的图书不存在", 'danger')
+                    conn.close()
+                except sqlite3.Error as e:
+                    flash(f"发生错误: {e}", 'danger')
+            elif search_type == 'title':
+                book_title = request.form['book_title']
+                try:
+                    conn = get_connection()
+                    cur = conn.cursor()
+                    cur.execute("SELECT * FROM books WHERE title = ?", (book_title,))
+                    books = cur.fetchall()
+                    if not books:
+                        flash(f"图书《{book_title}》不存在", 'danger')
+                    conn.close()
+                except sqlite3.Error as e:
+                    flash(f"发生错误: {e}", 'danger')
+            elif search_type == 'all':
+                try:
+                    conn = get_connection()
+                    cur = conn.cursor()
+                    cur.execute("SELECT * FROM books")
+                    books = cur.fetchall()
+                    conn.close()
+                except sqlite3.Error as e:
+                    flash(f"发生错误: {e}", 'danger')
+        return render_template('bookSearch_user.html', books=books)
+
     @app.route('/userSearch', methods=['POST', 'GET'])
     @login_required
     def userSearch():

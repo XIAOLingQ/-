@@ -1,3 +1,4 @@
+import re
 import sqlite3
 
 
@@ -36,14 +37,22 @@ class Adminer:
                 new_id = max_id + 1
             print(f"第{i + 1}本书的信息:")
             title = input("请输入图书名称:")
+            # 检查书名是否已经存在
+            cur.execute("SELECT COUNT(*) FROM books WHERE title = ?", (title,))
+            if cur.fetchone()[0] > 0:
+                print(f"书名 '{title}' 已经存在，拒绝插入。")
+                continue
             author = input("请输入作者:")
             publisher = input("请输入出版商:")
-            pub_date = input("请输入出版日期:")
+            pub_date = input("请输入出版日期（YYYY-MM-DD）:")
+            if not re.match(r'^\d{4}-\d{2}-\d{2}$', pub_date):
+                print("输入格式错误，请输入正确的日期格式（YYYY-MM-DD）。")
+                return
             price = input("请输入图书价格:")
             copies = input("请输入图书副本量:")
             try:
-                cur.execute("insert into books(id,title,author,publisher,pub_date,price,copies)"
-                            "values(?,?,?,?,?,?,?)", (new_id, title, author, publisher, pub_date, price, copies))
+                cur.execute("INSERT INTO books(id, title, author, publisher, pub_date, price, copies) "
+                            "VALUES(?,?,?,?,?,?,?)", (new_id, title, author, publisher, pub_date, price, copies))
             except sqlite3.Error as e:
                 print("An error occurred:", e)
 
@@ -70,7 +79,7 @@ class Adminer:
         print("请选择要修改的字段：")
         print("1. 作者")
         print("2. 出版商")
-        print("3. 出版日期")
+        print("3. 出版日期（YYYY-MM-DD）")
         print("4. 价格")
         print("5. 副本数量")
         print("输入多项请用逗号分隔（例如：1,2,3）：")
@@ -142,7 +151,7 @@ class Adminer:
                     conn.commit()
                     conn.close()
             elif flag == 2:
-                title = int(input("请输入图书名称："))
+                title = input("请输入图书名称：")
                 cur.execute("SELECT COUNT(*) FROM books WHERE title = ?", (title,))
                 if cur.fetchone()[0] == 0:
                     print(f"图书<<{title}>>不存在，无需删除")

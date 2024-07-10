@@ -106,36 +106,22 @@ class User:
     @staticmethod
     def querymybook(user_id):
         """
-        查询用户已借图书信息和状态
+        查询用户所借图书并返回列表
         """
         conn = getconn()
         cur = conn.cursor()
-        records = cur.execute("SELECT * FROM borrowed_books WHERE user_id=?", (user_id,)).fetchall()
-        today = datetime.today().date()  # 获取今天的日期（不包括时间部分）
-
-        for record in records:
-            if record[4] is not None:
-                # 使用正则表达式去除时间部分
-                date_part = re.split(r'[ ]', record[4])[0]
-                due_date = datetime.strptime(date_part, '%Y-%m-%d').date()
-
-                # 计算是否超期
-                if today > due_date:
-                    overdue_days = (today - due_date).days
-                    status = f"已超期{overdue_days}天"
-                else:
-                    status = "未超期"
-
-                # 获取图书信息并打印
-                book_info = cur.execute("SELECT * FROM books WHERE id=?", (record[2],)).fetchone()
-                if book_info:
-                    print(f"图书信息：图书编号:{book_info[0]}, 图书名字:{book_info[1]}, 作者：{book_info[2]}, 出版社：{book_info[3]}, 出版时间：{book_info[4]}, 价格：{book_info[5]}, 副本{book_info[0]}, 借书时间:{record[3]}, 归还期限:{record[4]}，{status}")
-                else:
-                    print("未找到对应的图书信息")
-
-        if not records:
-            print("信息为空，还未借书")
+        cur.execute("SELECT book_id FROM borrowed_books WHERE user_id = ?", (user_id,))
+        borrowed_books = cur.fetchall()
+        if not borrowed_books:
+            print("你没有借阅任何书籍。")
             return -1
+        else:
+            for book_id in borrowed_books:
+                cur.execute("SELECT id, title FROM books WHERE id = ?", (book_id[0],))
+                book = cur.fetchone()
+                if book:
+                    print(f"书籍编号: {book[0]}, 书名: {book[1]}")
+            return [book[0] for book in borrowed_books]
 
         cur.close()
         conn.close()
@@ -151,14 +137,20 @@ class User:
         print("你所借图书信息与状态")
         line = "-------------------------------------------"
         print(line)
-        a = User.querymybook(user_id)  # Assumes this method prints the user's borrowed books
+        borrowed_books = User.querymybook(user_id)  # 获取用户借阅的书籍列表
         print(line)
-        if a == -1:
+        if borrowed_books == -1:
             return
+
         number = input("请输入所还书籍的编号：")
 
-        cur.execute("UPDATE books SET copies = copies + 1 WHERE id = ?", (number,))
+        if int(number) not in borrowed_books:
+            print("所还书籍的编号不在所借列表中，拒绝还书。")
+            cur.close()
+            conn.close()
+            return
 
+        cur.execute("UPDATE books SET copies = copies + 1 WHERE id = ?", (number,))
         cur.execute("DELETE FROM borrowed_books WHERE user_id = ? AND book_id = ?", (user_id, number))
 
         print("还书成功")

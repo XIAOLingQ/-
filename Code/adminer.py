@@ -99,8 +99,11 @@ class Adminer:
                 updates.append("publisher = ?")
                 params.append(publisher)
             elif choice == '3':
-                pub_date = input("请输入修改后的出版日期：")
+                pub_date = input("请输入修改后的出版日期（YYYY-MM-DD）：")
                 updates.append("pub_date = ?")
+                if not re.match(r'^\d{4}-\d{2}-\d{2}$', pub_date):
+                    print("输入格式错误，请输入正确的日期格式（YYYY-MM-DD）。")
+                    return
                 params.append(pub_date)
             elif choice == '4':
                 price = float(input("请输入修改后的价格："))

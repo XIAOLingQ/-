@@ -58,6 +58,7 @@ class Adminer:
         print("\n")
         print("*************图书信息修改*************")
         book_name = input("请输入你要修改信息的图书的名字:")
+
         # 检查图书是否存在
         cur.execute("SELECT COUNT(*) FROM books WHERE title = ?", (book_name,))
         if cur.fetchone()[0] == 0:
@@ -65,21 +66,52 @@ class Adminer:
             conn.close()
             return
 
-        # 获取修改后的信息
-        id = int(input("请输入修改后的编号："))
-        author = input("请输入修改后的作者：")
-        publisher = input("请输入修改后的出版商：")
-        pub_date = input("请输入修改后的出版日期：")
-        price = input("请输入修改后的价格：")
-        copies = int(input("请输入修改后的副本数量："))
-        # 更新图书信息
+            # 显示修改选项
+        print("请选择要修改的字段：")
+        print("1. 作者")
+        print("2. 出版商")
+        print("3. 出版日期")
+        print("4. 价格")
+        print("5. 副本数量")
+        print("输入多项请用逗号分隔（例如：1,2,3）：")
+        choices = input("请输入选择：").split(',')
+
+        updates = []
+        params = []
+
+        for choice in choices:
+            choice = choice.strip()
+            if choice == '1':
+                author = input("请输入修改后的作者：")
+                updates.append("author = ?")
+                params.append(author)
+            elif choice == '2':
+                publisher = input("请输入修改后的出版商：")
+                updates.append("publisher = ?")
+                params.append(publisher)
+            elif choice == '3':
+                pub_date = input("请输入修改后的出版日期：")
+                updates.append("pub_date = ?")
+                params.append(pub_date)
+            elif choice == '4':
+                price = float(input("请输入修改后的价格："))
+                updates.append("price = ?")
+                params.append(price)
+            elif choice == '5':
+                copies = int(input("请输入修改后的副本数量："))
+                updates.append("copies = ?")
+                params.append(copies)
+
+            if not updates:
+                print("没有选择任何字段进行修改。")
+                conn.close()
+                return
+        # 构建 SQL 更新语句
+        sqlstring = f"UPDATE books SET {', '.join(updates)} WHERE title = ?"
+        params.append(book_name)
+
         try:
-            sqlstring = """
-                UPDATE books 
-                SET id = ?, author = ?, publisher = ?, pub_date = ?, price = ?, copies = ?
-                WHERE title = ?
-                """
-            cur.execute(sqlstring, (id, author, publisher, pub_date, price, copies, book_name))
+            cur.execute(sqlstring, params)
             conn.commit()
             print(f"****************图书<<{book_name}>>的信息修改成功！！！************")
         except sqlite3.Error as e:

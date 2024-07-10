@@ -23,24 +23,11 @@ class User:
         records = cur.execute("SELECT * FROM borrowed_books WHERE user_id=?", (user_id,)).fetchall()
         if not records:
             return 0  # 如果没有借阅记录，返回0
-
-        today = datetime.today().date()
         overtime_flag = 1
         for record in records:
-            if len(record) >= 7 and record[4] is not None and record[6] == 0:
-                due_date = datetime.strptime(record[4], '%Y-%m-%d').date()
-                if today > due_date:
-                    book_info = cur.execute("SELECT id, title FROM books WHERE id=?", (record[2],)).fetchone()
-                    if book_info:
-                        print(
-                            f"图书编号:{book_info[0]}, 图书名字:{book_info[1]}, 借书时间:{record[3]}, 归还期限:{record[4]}, 状态:{record[5]}")
-                    else:
-                        print("未找到对应的图书信息")
-                    overtime_flag = 2  # 如果有超期书，将标志设置为0
-
-        cur.close()
-        conn.close()
-        return overtime_flag  # 返回超期状态
+            if record[5] == '已超期':
+                overtime_flag = 2
+        return overtime_flag
 
     @staticmethod
     def borrowbook(user_id):
@@ -64,7 +51,7 @@ class User:
             return
 
         # 输入图书编号或名字
-        op = input("输入图书编号或者名字,请选择：")
+        op = input("输入(编号) 或 (名字),请选择：")
         if op == '编号':
             number = input("请输入图书编号：")
         else:
@@ -92,8 +79,7 @@ class User:
             conn.close()
             return
 
-        borrowtime = input("请输入借阅时间(yyyy-mm-dd)：")
-        borrow_date = datetime.strptime(borrowtime, "%Y-%m-%d").date()
+        borrow_date = datetime.now().date()
         return_date = borrow_date + timedelta(days=30)
         print(f"还书期限是30天，到期时间是：{return_date.strftime('%Y-%m-%d')}")
 
@@ -109,7 +95,7 @@ class User:
         # 将借阅信息插入到 borrowed_books 表
         cur.execute(
             "INSERT INTO borrowed_books (id, user_id, book_id, borrow_date, return_date, status) VALUES (?, ?, ?, ?, ?, ?)",
-            (max_id + 1, user_id, number, borrow_date.strftime('%Y-%m-%d'), return_date.strftime('%Y-%m-%d'), 0)
+            (max_id + 1, user_id, number, borrow_date.strftime('%Y-%m-%d'), return_date.strftime('%Y-%m-%d'), '未超期')
         )
 
         conn.commit()
@@ -149,6 +135,7 @@ class User:
 
         if not records:
             print("信息为空，还未借书")
+            return -1
 
         cur.close()
         conn.close()
@@ -164,24 +151,17 @@ class User:
         print("你所借图书信息与状态")
         line = "-------------------------------------------"
         print(line)
-        User.querymybook(user_id)  # Assumes this method prints the user's borrowed books
+        a = User.querymybook(user_id)  # Assumes this method prints the user's borrowed books
         print(line)
-
+        if a == -1:
+            return
         number = input("请输入所还书籍的编号：")
 
-        # Check if the user has borrowed this book
-        cur.execute("SELECT * FROM borrowed_books WHERE user_id = ? AND book_id = ?", (user_id, number))
-        record = cur.fetchone()
-        if record is None:
-            print("你未借过该图书")
-        else:
-            # Update the books table to increase the number of copies
-            cur.execute("UPDATE books SET copies = copies + 1 WHERE id = ?", (number,))
+        cur.execute("UPDATE books SET copies = copies + 1 WHERE id = ?", (number,))
 
-            # Delete the borrowed book record from borrowed_books table
-            cur.execute("DELETE FROM borrowed_books WHERE user_id = ? AND book_id = ?", (user_id, number))
+        cur.execute("DELETE FROM borrowed_books WHERE user_id = ? AND book_id = ?", (user_id, number))
 
-            print("还书成功")
+        print("还书成功")
 
         conn.commit()
         cur.close()

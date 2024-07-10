@@ -35,12 +35,12 @@ class Adminer:
             else:
                 new_id = max_id + 1
             print(f"第{i + 1}本书的信息:")
-            title = input("The book_name is:")
-            author = input("The book_author is:")
-            publisher = input("The book_publisher is:")
-            pub_date = input("The pub_date is:")
-            price = input("The book_price is:")
-            copies = input("The copies is:")
+            title = input("请输入图书名称:")
+            author = input("请输入作者:")
+            publisher = input("请输入出版商:")
+            pub_date = input("请输入出版日期:")
+            price = input("请输入图书价格:")
+            copies = input("请输入图书副本量:")
             try:
                 cur.execute("insert into books(id,title,author,publisher,pub_date,price,copies)"
                             "values(?,?,?,?,?,?,?)", (new_id, title, author, publisher, pub_date, price, copies))

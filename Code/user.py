@@ -54,7 +54,7 @@ class User:
         op = input("输入(编号) 或 (名字),请选择：")
         if op == '编号':
             number = input("请输入图书编号：")
-        else:
+        elif op == '名字':
             name = input("请输入图书名字：")
             result = cur.execute("SELECT id FROM books WHERE title=?", (name,)).fetchone()
             if result is None:
@@ -63,7 +63,9 @@ class User:
                 conn.close()
                 return
             number = result[0]
-
+        else:
+            print("输入错误")
+            return
         # 查询图书副本数量
         result = cur.execute("SELECT copies FROM books WHERE id=?", (number,)).fetchone()
         if result is None:

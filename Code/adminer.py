@@ -25,6 +25,8 @@ class Adminer:
         while amount <= 0:
             try:
                 amount = int(input("请输入录入图书的数量: "))
+                if amount <= 0:
+                    print("录入数量小于或等于0")
             except ValueError:
                 print("请输入一个有效的数字")
                 amount = 0
@@ -37,22 +39,47 @@ class Adminer:
                 new_id = max_id + 1
             print(f"第{i + 1}本书的信息:")
             title = input("请输入图书名称:")
+            while not title:
+                title = input("书名不能为空请重试:")
+
             # 检查书名是否已经存在
             cur.execute("SELECT COUNT(*) FROM books WHERE title = ?", (title,))
             if cur.fetchone()[0] > 0:
                 print(f"书名 '{title}' 已经存在，拒绝插入。")
                 continue
             author = input("请输入作者:")
+            while not author:
+                author = input("作者不能为空请重试:")
             publisher = input("请输入出版商:")
+            while not publisher:
+                publisher = input("出版社不能为空请重试:")
+
             pub_date = input("请输入出版日期（YYYY-MM-DD）:")
-            if not re.match(r'^\d{4}-\d{2}-\d{2}$', pub_date):
-                print("输入格式错误，请输入正确的日期格式（YYYY-MM-DD）。")
-                return
-            price = input("请输入图书价格:")
-            copies = input("请输入图书副本量:")
-            if not title :
-                print("书名不能为空，请重试。")
-                continue
+            while not re.match(r'^\d{4}-\d{2}-\d{2}$', pub_date):
+                pub_date = input("输入格式错误，请输入正确的日期格式（YYYY-MM-DD）:")
+
+            while True:
+                try:
+                    price = int(input("请输入录入图书的价格: "))
+                    if price <= 0:
+                        print("价格不能小于或等于0，请重试！")
+                        continue
+                    break
+                except ValueError:
+                    print("价格应是一个整数，请重新输入！")
+
+            while True:
+                try:
+                    copies = int(input("请输入录入图书的数量: "))
+                    if copies < 3:
+                        print("副本数量不能小于3，请重试！")
+                        continue
+                    break
+                except ValueError:
+                    print("数量应是一个整数，请重新输入！")
+
+                break
+
             try:
                 cur.execute("INSERT INTO books(id, title, author, publisher, pub_date, price, copies) "
                             "VALUES(?,?,?,?,?,?,?)", (new_id, title, author, publisher, pub_date, price, copies))

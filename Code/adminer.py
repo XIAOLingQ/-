@@ -211,10 +211,10 @@ class Adminer:
                 continue
             if flag == 1:
                 try:
-                    id = int(input("请输入一个整数："))
+                    id = int(input("请输入编号："))
                 except ValueError:
-                    print("输入无效，请输入一个整数。")
-                    continue
+                    print("无效输入！")
+                    return
 
                 cur.execute("SELECT COUNT(*) FROM books WHERE id = ?", (id,))
                 if cur.fetchone()[0] == 0:

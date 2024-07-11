@@ -379,13 +379,23 @@ class Adminer:
         cur.close()
         conn.close()
 
-
+    def chech_users(self):
+        conn = self.getConnection()
+        cur = conn.cursor()
+        cur.execute(
+            "SELECT id,name FROM user ")
+        records = cur.fetchall()
+        for record in records:
+            print(
+                f"用户id: {record[0]}, 用户名: {record[1]}")
+        cur.close()
+        conn.close()
 
 def menuadminer():
     print("**************管理员***************")
     print("1.录入图书信息     2.修改图书信息    3.删除图书信息")
     print("4.查询图书信息     5.查询任意用户借书状态 6.查询所有用户的借书状态")
-    print("7.退出")
+    print("7.总览所有用户     8.退出")
 
 def validate_choices(choices):
     # 验证输入是否为“1,2,3”格式

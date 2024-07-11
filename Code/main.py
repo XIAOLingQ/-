@@ -68,7 +68,9 @@ while True:
                 using.userSearch()
             elif flag == 6:
                 using.chech_borrowed_users()
-            elif flag == 7:
+            elif flag ==7:
+                using.chech_users()
+            elif flag == 8:
                 break
             else:
                 print("输入错误，请重新输入：")

@@ -144,7 +144,11 @@ class User:
         if borrowed_books == -1:
             return
 
-        number = input("请输入所还书籍的编号：")
+        try:
+            number = int(input("请输入一个整数："))
+        except ValueError:
+            print("输入无效，请输入一个整数。")
+            return
 
         if int(number) not in borrowed_books:
             print("所还书籍的编号不在所借列表中，拒绝还书。")
@@ -172,16 +176,28 @@ class User:
             print("1.查询某本图书")
             print("2.总览图书管所有图书")
             print("3.退出")
-            order = int(input("请选择查询操作："))
+            try:
+                order = int(input("请输入一个整数："))
+            except ValueError:
+                print("输入无效，请输入一个整数。")
+                continue
             if order == 1:
                 flag = -1
                 while flag == -1:
                     print("1.按图书编号进行查询")
                     print("2.按图书名称进行查询")
                     print("3.退出")
-                    flag = int(input("请选择查询方式："))
+                    try:
+                        flag= int(input("请输入一个整数："))
+                    except ValueError:
+                        print("输入无效，请输入一个整数。")
+                        continue
                     if flag == 1:
-                        id = int(input("请输入图书编号："))
+                        try:
+                            id = int(input("请输入一个整数："))
+                        except ValueError:
+                            print("输入无效，请输入一个整数。")
+                            continue
                         cur.execute("SELECT COUNT(*) FROM books WHERE id = ?", (id,))
                         if cur.fetchone()[0] == 0:
                             print(f"编号为{id}的图书不存在")

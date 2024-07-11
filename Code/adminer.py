@@ -50,6 +50,9 @@ class Adminer:
                 return
             price = input("请输入图书价格:")
             copies = input("请输入图书副本量:")
+            if not title :
+                print("书名不能为空，请重试。")
+                continue
             try:
                 cur.execute("INSERT INTO books(id, title, author, publisher, pub_date, price, copies) "
                             "VALUES(?,?,?,?,?,?,?)", (new_id, title, author, publisher, pub_date, price, copies))
@@ -142,9 +145,18 @@ class Adminer:
             print("1.按图书编号进行删除")
             print("2.按图书名称进行删除")
             print("3.退出")
-            flag = int(input("请选择删除方式："))
+            try:
+                flag = int(input("请输入一个整数："))
+            except ValueError:
+                print("输入无效，请输入一个整数。")
+                continue
             if flag == 1:
-                id = int(input("请输入图书编号："))
+                try:
+                    id = int(input("请输入一个整数："))
+                except ValueError:
+                    print("输入无效，请输入一个整数。")
+                    continue
+
                 cur.execute("SELECT COUNT(*) FROM books WHERE id = ?", (id,))
                 if cur.fetchone()[0] == 0:
                     print(f"编号为{id}的图书不存在，无需删除")
@@ -180,16 +192,28 @@ class Adminer:
             print("1.查询某本图书")
             print("2.总览图书管所有图书")
             print("3.退出")
-            order = int(input("请选择查询操作："))
+            try:
+                order = int(input("请输入一个整数："))
+            except ValueError:
+                print("输入无效，请输入一个整数。")
+                continue
             if order == 1:
                 flag = -1
                 while flag == -1:
                     print("1.按图书编号进行查询")
                     print("2.按图书名称进行查询")
                     print("3.退出")
-                    flag = int(input("请选择查询方式："))
+                    try:
+                        flag = int(input("请输入一个整数："))
+                    except ValueError:
+                        print("输入无效，请输入一个整数。")
+                        continue
                     if flag == 1:
-                        id = int(input("请输入图书编号："))
+                        try:
+                            id = int(input("请输入一个整数："))
+                        except ValueError:
+                            print("输入无效，请输入一个整数。")
+                            continue
                         cur.execute("SELECT COUNT(*) FROM books WHERE id = ?", (id,))
                         if cur.fetchone()[0] == 0:
                             print(f"编号为{id}的图书不存在")
@@ -227,7 +251,8 @@ class Adminer:
                 cur.execute("select * from books ")
                 records = cur.fetchall()
                 for line in records:
-                    print(f"图书编号: {line[0]}, 书名: {line[1]}, 作者: {line[2]}, 出版社: {line[3]}, 出版日期: {line[4]},价格: {line[5]}, 副本数量: {line[6]}")
+                    print(
+                        f"图书编号: {line[0]}, 书名: {line[1]}, 作者: {line[2]}, 出版社: {line[3]}, 出版日期: {line[4]},价格: {line[5]}, 副本数量: {line[6]}")
                 cur.close()
                 conn.close()
             elif order == 3:
@@ -241,7 +266,11 @@ class Adminer:
         conn = self.getConnection()
         cur = conn.cursor()
         print("*************查询任意用户借书状态*************")
-        id = int(input("请输入所要查询的用户id："))
+        try:
+            id = int(input("请输入一个整数："))
+        except ValueError:
+            print("输入无效，请输入一个整数。")
+            return
         # 检查用户是否存在
         cur.execute("SELECT COUNT(*) FROM user WHERE id = ?", (id,))
         if cur.fetchone()[0] == 0:

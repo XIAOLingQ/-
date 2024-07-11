@@ -220,20 +220,38 @@ class Adminer:
                 if cur.fetchone()[0] == 0:
                     print(f"编号为{id}的图书不存在，无需删除")
                 else:
-                    cur.execute("delete from books where id =?", (id,))
-                    print(f"*************编号为{id}的图书已成功删除！！！*************")
-                    conn.commit()
-                    conn.close()
+                    # 检查是否有人借了这本书
+                    row = cur.execute("SELECT * FROM borrowed_books WHERE book_id = ?", (id,)).fetchall()
+                    if row:
+                        print("有人借这本书拒绝删除！！！！")
+                    else:
+                        cur.execute("DELETE FROM books WHERE id = ?", (id,))
+                        print(f"*************编号为{id}的图书已成功删除！！！*************")
+                        conn.commit()
+                conn.close()
+
             elif flag == 2:
                 title = input("请输入图书名称：")
-                cur.execute("SELECT COUNT(*) FROM books WHERE title = ?", (title,))
-                if cur.fetchone()[0] == 0:
+                if not title:
+                    print("图书名不能为空！！！")
+                    continue
+                # 首先通过title获取book_id
+                cur.execute("SELECT id FROM books WHERE title = ?", (title,))
+                book_id_row = cur.fetchone()
+
+                if book_id_row is None:
                     print(f"图书<<{title}>>不存在，无需删除")
                 else:
-                    cur.execute("delete from books where title =?", (title,))
-                    print(f"*************图书<<{title}>>已成功删除！！！*************")
-                    conn.commit()
-                    conn.close()
+                    book_id = book_id_row[0]
+
+                    # 检查是否有人借了这本书
+                    cur.execute("SELECT COUNT(*) FROM borrowed_books WHERE book_id = ?", (book_id,))
+                    if cur.fetchone()[0] > 0:
+                        print(f"图书<<{title}>>有人正在借阅，无法删除")
+                    else:
+                        cur.execute("DELETE FROM books WHERE book_id = ?", (book_id,))
+                        print(f"*************图书<<{title}>>已成功删除！！！*************")
+                        conn.commit()
             elif flag == 3:
                 return
             else:

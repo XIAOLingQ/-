@@ -1,5 +1,6 @@
 import re
 import sqlite3
+from datetime import datetime
 
 
 class Adminer:
@@ -60,13 +61,13 @@ class Adminer:
 
             while True:
                 try:
-                    price = int(input("请输入录入图书的价格: "))
+                    price = float(input("请输入录入图书的价格: "))
                     if price <= 0:
                         print("价格不能小于或等于0，请重试！")
                         continue
                     break
                 except ValueError:
-                    print("价格应是一个整数，请重新输入！")
+                    print("价格应是一个浮点数，请重新输入！")
 
             while True:
                 try:
@@ -153,13 +154,13 @@ class Adminer:
             elif choice == '4':
                 while True:
                     try:
-                        price = int(input("请输入录入图书的价格: "))
+                        price = float(input("请输入录入图书的价格: "))
                         if price <= 0:
                             print("价格不能小于或等于0，请重试！")
                             continue
                         break
                     except ValueError:
-                        print("价格应是一个整数，请重新输入！")
+                        print("价格应是一个浮点数，请重新输入！")
                 updates.append("price = ?")
                 params.append(price)
             elif choice == '5':
@@ -286,11 +287,13 @@ class Adminer:
                         print("输入无效，请输入一个整数。")
                         continue
                     if flag == 1:
-                        try:
-                            id = int(input("请输入一个整数："))
-                        except ValueError:
-                            print("输入无效，请输入一个整数。")
-                            continue
+                        while True:
+                            try:
+                                id = int(input("请输入编号："))
+                            except ValueError:
+                                print("输入无效，请重新输！")
+                                continue
+                            break
                         cur.execute("SELECT COUNT(*) FROM books WHERE id = ?", (id,))
                         if cur.fetchone()[0] == 0:
                             print(f"编号为{id}的图书不存在")
@@ -313,7 +316,8 @@ class Adminer:
                             conn.commit()
                             print(f"图书<<{title}>>的信息如下：")
                             for row in cur:
-                                print(f"编号：{row[0]},书名：{row[1]},作者： {row[2]},出版社： {row[3]},出版日期：{row[4]},价格：{row[5]},副本数量：{row[6]}")
+                                print(
+                                    f"编号：{row[0]},书名：{row[1]},作者： {row[2]},出版社： {row[3]},出版日期：{row[4]},价格：{row[5]},副本数量：{row[6]}")
                             cur.close()
                             conn.close()
 
@@ -342,11 +346,13 @@ class Adminer:
         conn = self.getConnection()
         cur = conn.cursor()
         print("*************查询任意用户借书状态*************")
-        try:
-            id = int(input("请输入一个整数："))
-        except ValueError:
-            print("输入无效，请输入一个整数。")
-            return
+        while True:
+            try:
+                id = int(input("请输入ID："))
+                break
+            except ValueError:
+                print("输入无效，请重新输入。")
+                return
         # 检查用户是否存在
         cur.execute("SELECT COUNT(*) FROM user WHERE id = ?", (id,))
         if cur.fetchone()[0] == 0:
@@ -363,19 +369,44 @@ class Adminer:
                 records = cur.fetchall()
                 for line in records:
                     cur.execute("SELECT title FROM books WHERE id = ?", (line[2],))
-                    title = cur.fetchall()
-                    print(f"图书编号：{line[2]} 书名《{title[0][0]}》 借书时间：{line[3]} 还书期限：{line[4]} {line[5]}")
+                    title = cur.fetchone()
+                    borrowed_date = line[3]
+                    due_date = line[4]
+
+                    # 计算超期天数
+                    due_date_obj = datetime.strptime(due_date, '%Y-%m-%d')
+                    current_date_obj = datetime.now()
+
+                    overdue_days = (current_date_obj - due_date_obj).days
+                    overdue_message = f"超期 {overdue_days} 天" if overdue_days > 0 else "未超期"
+
+                    print(f"图书编号：{line[2]} 书名《{title[0]}》 借书时间：{borrowed_date} 还书期限：{due_date} {overdue_message}")
                 cur.close()
                 conn.close()
 
     def chech_borrowed_users(self):
         conn = self.getConnection()
         cur = conn.cursor()
-        cur.execute("SELECT bb.*,aa.name,cc.title FROM borrowed_books bb,user aa,books cc where bb.user_id = aa.id and bb.book_id =cc.id")
+        cur.execute("""
+            SELECT bb.*, aa.name, cc.title 
+            FROM borrowed_books bb
+            JOIN user aa ON bb.user_id = aa.id
+            JOIN books cc ON bb.book_id = cc.id
+        """)
         records = cur.fetchall()
         for record in records:
+            borrowed_date = record[3]
+            due_date = record[4]
+            status = record[5]
+            current_date_obj = datetime.now()
+            due_date_obj = datetime.strptime(due_date, '%Y-%m-%d')
+
+            overdue_days = (current_date_obj - due_date_obj).days
+            overdue_message = f"超期 {overdue_days} 天" if overdue_days > 0 else "未超期"
+
             print(
-                f"借书编号: {record[0]}, 姓名: {record[6]}, 书名: {record[7]}, 借书日期: {record[3]}, 还书日期: {record[4]},状态: {record[5]}")
+                f"借书编号: {record[0]}, 姓名: {record[6]}, 书名: {record[7]}, 借书日期: {borrowed_date}, 还书日期: {due_date}, 状态: {overdue_message}"
+            )
         cur.close()
         conn.close()
 

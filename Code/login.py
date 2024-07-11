@@ -70,8 +70,9 @@ def loggin():
 
                 username = input("请输入用户名: ")
                 password = input("请输入密码: ")
+                name = input("请输入昵称: ")
 
-                if not username or not password:
+                if not username or not password or not name:
                     print("用户名和密码不能为空，请重试。")
                     continue
 
@@ -95,8 +96,8 @@ def loggin():
                 else:
                     new_id = max_id + 1
 
-                insert_query = f"INSERT INTO {reg_table} (id, username, password) VALUES (?, ?, ?)"
-                cursor.execute(insert_query, (new_id, username, password))
+                insert_query = f"INSERT INTO {reg_table} (id, username, password,name) VALUES (?, ?, ?, ?)"
+                cursor.execute(insert_query, (new_id, username, password,name))
                 conn.commit()
                 conn.close()
                 print("注册成功！")

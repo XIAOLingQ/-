@@ -198,11 +198,13 @@ class User:
                         print("输入无效，请输入一个整数。")
                         continue
                     if flag == 1:
-                        try:
-                            id = int(input("请输入一个整数："))
-                        except ValueError:
-                            print("输入无效，请输入一个整数。")
-                            continue
+                        while True:
+                            try:
+                                id = int(input("请输入编号："))
+                            except ValueError:
+                                print("输入无效，请重新输！")
+                                continue
+                            break
                         cur.execute("SELECT COUNT(*) FROM books WHERE id = ?", (id,))
                         if cur.fetchone()[0] == 0:
                             print(f"编号为{id}的图书不存在")

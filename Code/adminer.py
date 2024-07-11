@@ -74,7 +74,6 @@ class Adminer:
                     if copies < 3:
                         print("副本数量不能小于3，请重试！")
                         continue
-                    break
                 except ValueError:
                     print("数量应是一个整数，请重新输入！")
                     continue
@@ -96,6 +95,12 @@ class Adminer:
         cur = conn.cursor()
         print("\n")
         print("*************图书信息修改*************")
+        print("所有图书信息如下：")
+        cur.execute("select * from books ")
+        records = cur.fetchall()
+        for line in records:
+            print(
+                f"图书编号: {line[0]}, 书名: {line[1]}, 作者: {line[2]}, 出版社: {line[3]}, 出版日期: {line[4]},价格: {line[5]}, 副本数量: {line[6]}")
         book_name = input("请输入你要修改信息的图书的名字:")
 
         # 检查图书是否存在
@@ -113,7 +118,13 @@ class Adminer:
         print("4. 价格")
         print("5. 副本数量")
         print("输入多项请用逗号分隔（例如：1,2,3）：")
-        choices = input("请输入选择：").split(',')
+        while True:
+            choices = input("请输入选择：")
+            if validate_choices(choices):
+                choices.split(',')
+                break
+            else:
+                print("输入格式不正确，请按1,2,3格式输入。")
 
         updates = []
         params = []
@@ -122,10 +133,14 @@ class Adminer:
             choice = choice.strip()
             if choice == '1':
                 author = input("请输入修改后的作者：")
+                while not author:
+                    author = input("作者不能为空请重试:")
                 updates.append("author = ?")
                 params.append(author)
             elif choice == '2':
                 publisher = input("请输入修改后的出版商：")
+                while not publisher:
+                    publisher = input("出版商不能为空请重试:")
                 updates.append("publisher = ?")
                 params.append(publisher)
             elif choice == '3':
@@ -136,11 +151,28 @@ class Adminer:
                     return
                 params.append(pub_date)
             elif choice == '4':
-                price = float(input("请输入修改后的价格："))
+                while True:
+                    try:
+                        price = int(input("请输入录入图书的价格: "))
+                        if price <= 0:
+                            print("价格不能小于或等于0，请重试！")
+                            continue
+                        break
+                    except ValueError:
+                        print("价格应是一个整数，请重新输入！")
                 updates.append("price = ?")
                 params.append(price)
             elif choice == '5':
-                copies = int(input("请输入修改后的副本数量："))
+                while True:
+                    try:
+                        copies = int(input("请输入录入图书的数量: "))
+                        if copies < 3:
+                            print("副本数量不能小于3，请重试！")
+                            continue
+                    except ValueError:
+                        print("数量应是一个整数，请重新输入！")
+                        continue
+                    break
                 updates.append("copies = ?")
                 params.append(copies)
 
@@ -263,8 +295,7 @@ class Adminer:
                             conn.commit()
                             print(f"图书<<{title}>>的信息如下：")
                             for row in cur:
-                                print(
-                                    f"编号：{row[0]},书名：{row[1]},作者： {row[2]},出版社： {row[3]},出版日期：{row[4]},价格：{row[5]},副本数量：{row[6]}")
+                                print(f"编号：{row[0]},书名：{row[1]},作者： {row[2]},出版社： {row[3]},出版日期：{row[4]},价格：{row[5]},副本数量：{row[6]}")
                             cur.close()
                             conn.close()
 
@@ -338,3 +369,8 @@ def menuadminer():
     print("4.查询图书信息     5.查询任意用户借书状态 6.查询所有用户的借书状态")
     print("7.退出")
 
+def validate_choices(choices):
+    # 验证输入是否为“1,2,3”格式
+    if all(choice.isdigit() and 1 <= int(choice) <= 5 for choice in choices.split(',')):
+        return True
+    return False

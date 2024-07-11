@@ -49,7 +49,12 @@ class User:
         if row[0] >= 2:
             print("对不起，一个账号一次只能借阅两本书，你已经达到数量上限")
             return
-
+        print("所有图书信息如下：")
+        cur.execute("select * from books ")
+        records = cur.fetchall()
+        for line in records:
+            print(
+                f"图书编号: {line[0]}, 书名: {line[1]}, 作者: {line[2]}, 出版社: {line[3]}, 出版日期: {line[4]},价格: {line[5]}, 副本数量: {line[6]}")
         # 输入图书编号或名字
         op = input("输入(编号) 或 (名字),请选择：")
         if op == '编号':

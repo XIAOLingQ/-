@@ -82,12 +82,12 @@ class Adminer:
             try:
                 cur.execute("INSERT INTO books(id, title, author, publisher, pub_date, price, copies) "
                             "VALUES(?,?,?,?,?,?,?)", (new_id, title, author, publisher, pub_date, price, copies))
+                conn.commit()
+                conn.close()
+                print("***************新增图书成功！！！***************")
             except sqlite3.Error as e:
                 print("An error occurred:", e)
 
-        conn.commit()
-        conn.close()
-        print("***************新增图书成功！！！***************")
 
     # 修改图书信息
     def bookModify(self):
@@ -393,8 +393,8 @@ class Adminer:
 
 def menuadminer():
     print("**************管理员***************")
-    print("1.录入图书信息     2.修改图书信息    3.删除图书信息")
-    print("4.查询图书信息     5.查询任意用户借书状态 6.查询所有用户的借书状态")
+    print("1.录入图书信息     2.修改图书信息        3.删除图书信息")
+    print("4.查询图书信息     5.查询任意用户借书状态  6.查询所有用户的借书状态")
     print("7.总览所有用户     8.退出")
 
 def validate_choices(choices):

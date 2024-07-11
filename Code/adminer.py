@@ -77,7 +77,7 @@ class Adminer:
                     break
                 except ValueError:
                     print("数量应是一个整数，请重新输入！")
-
+                    continue
                 break
 
             try:

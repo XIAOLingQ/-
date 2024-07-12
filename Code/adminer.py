@@ -250,7 +250,7 @@ class Adminer:
                     if cur.fetchone()[0] > 0:
                         print(f"图书<<{title}>>有人正在借阅，无法删除")
                     else:
-                        cur.execute("DELETE FROM books WHERE book_id = ?", (book_id,))
+                        cur.execute("DELETE FROM books WHERE id = ?", (book_id,))
                         print(f"*************图书<<{title}>>已成功删除！！！*************")
                         conn.commit()
             elif flag == 3:

@@ -83,11 +83,12 @@ class Adminer:
             try:
                 cur.execute("INSERT INTO books(id, title, author, publisher, pub_date, price, copies) "
                             "VALUES(?,?,?,?,?,?,?)", (new_id, title, author, publisher, pub_date, price, copies))
-                conn.commit()
-                conn.close()
                 print("***************新增图书成功！！！***************")
             except sqlite3.Error as e:
                 print("An error occurred:", e)
+
+        conn.commit()
+        conn.close()
 
 
     # 修改图书信息
@@ -200,6 +201,11 @@ class Adminer:
         cur = conn.cursor()
         print("\n")
         print("*************图书删除*************")
+        cur.execute("select * from books ")
+        records = cur.fetchall()
+        for line in records:
+            print(
+                f"图书编号: {line[0]}, 书名: {line[1]}, 作者: {line[2]}, 出版社: {line[3]}, 出版日期: {line[4]},价格: {line[5]}, 副本数量: {line[6]}")
         flag = -1
         while flag == -1:
             print("1.按图书编号进行删除")

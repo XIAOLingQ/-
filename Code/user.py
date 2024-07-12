@@ -117,21 +117,32 @@ class User:
         """
         conn = getconn()
         cur = conn.cursor()
-        cur.execute("SELECT book_id FROM borrowed_books WHERE user_id = ?", (user_id,))
-        borrowed_books = cur.fetchall()
-        if not borrowed_books:
-            print("你没有借阅任何书籍。")
-            return -1
-        else:
-            for book_id in borrowed_books:
-                cur.execute("SELECT id, title FROM books WHERE id = ?", (book_id[0],))
-                book = cur.fetchone()
-                if book:
-                    print(f"书籍编号: {book[0]}, 书名: {book[1]}")
-            return [book[0] for book in borrowed_books]
+        cur.execute("SELECT * FROM borrowed_books WHERE user_id = ?", (user_id,))
+        records = cur.fetchall()
+
+        borrowed_books = []  # 存储借阅的书籍编号
+
+        for line in records:
+            cur.execute("SELECT title FROM books WHERE id = ?", (line[2],))
+            title = cur.fetchone()
+            borrowed_date = line[3]
+            due_date = line[4]
+
+            # 计算超期天数
+            due_date_obj = datetime.strptime(due_date, '%Y-%m-%d')
+            current_date_obj = datetime.now()
+
+            overdue_days = (current_date_obj - due_date_obj).days
+            overdue_message = f"超期 {overdue_days} 天" if overdue_days > 0 else "未超期"
+
+            print(f"图书编号：{line[2]} 书名《{title[0]}》 借书时间：{borrowed_date} 还书期限：{due_date} {overdue_message}")
+
+            borrowed_books.append(line[2])  # 将书籍编号添加到列表中
 
         cur.close()
         conn.close()
+
+        return borrowed_books  # 返回借阅的书籍编号列表
 
     @staticmethod
     def returnbook(user_id):

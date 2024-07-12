@@ -73,7 +73,7 @@ def loggin():
                 name = input("请输入昵称: ")
 
                 if not username or not password or not name:
-                    print("用户名和密码不能为空，请重试。")
+                    print("用户名、密码和昵称不能为空，请重试。")
                     continue
 
                 conn = getconnection()
